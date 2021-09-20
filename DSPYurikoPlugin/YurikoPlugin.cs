@@ -1115,7 +1115,62 @@ namespace DSPYurikoPlugin
             return false;
         }
 
+        // 星球矿机
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(FactorySystem), "CheckBeforeGameTick")]
+        public static void FactorySystemGameTickPostPatch(
+            ref FactorySystem __instance)
+        {
+            uint ticks = 60;
+            if (!frames.ContainsKey(__instance.planet.id))
+            {
+                frames.Add(__instance.planet.id, 0);
+            }
+            if (frames[__instance.planet.id]++ % ticks != 0)
+            {
+                return;
+            }
+            int ratio = 1;
+            var veinPool = __instance.factory.veinPool;
+            HashSet<int> veinSet = new HashSet<int>();
+            for (int i = 0; i < veinPool.Length; ++i)
+            {
+                veinSet.Add(veinPool[i].productId);
+            }
+            int[] productRegister = (int[])null;
+            if (GameMain.statistics.production.factoryStatPool[__instance.factory.index] != null)
+            {
+                productRegister = GameMain.statistics.production.factoryStatPool[__instance.factory.index].productRegister;
+            }
+            for (int stationIndex = 1; stationIndex < __instance.planet.factory.transport.stationCursor; ++stationIndex)
+            {
+                var station = __instance.planet.factory.transport.stationPool[stationIndex];
+                if (station != null && station.storage != null)
+                {
+                    for (int storageIndex = 0; storageIndex < station.storage.Length; ++storageIndex)
+                    {
+                        var stationStore = station.storage[storageIndex];
+                        if (stationStore.count < stationStore.max)
+                        {
+                            float amount = 0f;
+                            if (veinSet.Contains(stationStore.itemId) || stationStore.itemId == __instance.planet.waterItemId)
+                            {
+                                amount += ticks;
+                                amount *= ratio * GameMain.history.miningSpeedScale;
+                                station.storage[storageIndex].count += (int)amount;
+                                if (productRegister != null)
+                                {
+                                    productRegister[stationStore.itemId] += (int)amount;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
+
+        private static Dictionary<int, ulong> frames = new Dictionary<int, ulong>();
         private static bool InserterUpdateCommonPatch(
             ref InserterComponent __instance,
             PlanetFactory factory,
