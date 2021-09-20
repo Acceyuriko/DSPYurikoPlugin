@@ -945,6 +945,31 @@ namespace DSPYurikoPlugin
             }
         }
 
+        // 物流站小飞机
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(StationComponent), "InternalTickLocal")]
+        public static bool StationInternalTickLocalPatch(ref float dt)
+        {
+            dt *= 2;
+            return true;
+        }
+
+        // 物流站大飞机
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(StationComponent), "InternalTickRemote")]
+        public static bool StationInternalTickRemotePatch(
+            ref double dt,
+            ref float shipSailSpeed,
+            ref float shipWarpSpeed)
+        {
+            int ratio = 2;
+            dt *= ratio;
+            shipSailSpeed *= ratio;
+            shipWarpSpeed *= ratio;
+            return true;
+        }
+
+
         private static bool InserterUpdateCommonPatch(
             ref InserterComponent __instance,
             PlanetFactory factory,
