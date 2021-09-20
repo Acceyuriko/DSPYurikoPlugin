@@ -969,6 +969,15 @@ namespace DSPYurikoPlugin
             return true;
         }
 
+        // 轨道采集器
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(StationComponent), "UpdateCollection")]
+        public static bool StationUpdateCollectionPatch(ref float collectSpeedRate)
+        {
+            collectSpeedRate *= 10;
+            return true;
+        }
+
 
         private static bool InserterUpdateCommonPatch(
             ref InserterComponent __instance,
