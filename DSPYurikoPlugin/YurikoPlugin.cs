@@ -49,23 +49,20 @@ namespace DSPYurikoPlugin
                     lock (numArray)
                     {
                         int index = ___bufferLength - 5 - 1;
-                        if (__instance.buffer[index] == 250)
+                        if (__instance.buffer[index] == (byte)250)
                         {
-                            int cargoId = __instance.buffer[index + 1] - 1 +
-                                (__instance.buffer[index + 2] - 1) * 100 +
-                                (__instance.buffer[index + 3] - 1) * 10000 +
-                                (__instance.buffer[index + 4] - 1) * 1000000;
+                            int cargoId = (int)__instance.buffer[index + 1] - 1 + ((int)__instance.buffer[index + 2] - 1) * 100 + ((int)__instance.buffer[index + 3] - 1) * 10000 + ((int)__instance.buffer[index + 4] - 1) * 1000000;
                             if (__instance.closed)
                             {
                                 if (__instance.outputPath.TryInsertCargoNoSqueeze(__instance.outputIndex, cargoId))
                                 {
-                                    Array.Clear(__instance.buffer, index - 4, 10);
+                                    Array.Clear((Array)__instance.buffer, index - 4, 10);
                                     ___updateLen = ___bufferLength;
                                 }
                             }
                             else if (__instance.outputPath.TryInsertCargo(__instance.outputIndex, cargoId))
                             {
-                                Array.Clear(__instance.buffer, index - 4, 10);
+                                Array.Clear((Array)__instance.buffer, index - 4, 10);
                                 ___updateLen = ___bufferLength;
                             }
                         }
@@ -78,10 +75,8 @@ namespace DSPYurikoPlugin
             }
             lock (__instance.buffer)
             {
-                for (int index = ___updateLen - 1; index >= 0 && __instance.buffer[index] != 0; --index)
-                {
+                for (int index = ___updateLen - 1; index >= 0 && __instance.buffer[index] != (byte)0; --index)
                     --___updateLen;
-                }
                 if (___updateLen == 0)
                 {
                     return false;
@@ -90,91 +85,54 @@ namespace DSPYurikoPlugin
                 for (int index1 = ___chunkCount - 1; index1 >= 0; --index1)
                 {
                     int index2 = __instance.chunks[index1 * 3];
-                    int num2 = __instance.chunks[index1 * 3 + 2];
+                    int speed = __instance.chunks[index1 * 3 + 2] * 2; // 倍速
                     if (index2 < num1)
                     {
-                        if (__instance.buffer[index2] != 0)
+                        if (__instance.buffer[index2] != (byte)0)
                         {
                             for (int index3 = index2 - 5; index3 < index2 + 4; ++index3)
                             {
-                                if (index3 >= 0 && __instance.buffer[index3] == 250)
+                                if (index3 >= 0 && __instance.buffer[index3] == (byte)250)
                                 {
                                     index2 = index3 >= index2 ? index3 - 4 : index3 + 5 + 1;
                                     break;
                                 }
                             }
                         }
-                        num2 *= 10;// 传送带倍速，实际倍速不足，10倍大概能跑到 100/s
-                        if (num2 > 10)
+                        int num2 = 0;
+                    label_41:
+                        while (num2 < speed)
                         {
-                            for (int index4 = 10; index4 <= num2; ++index4)
-                            {
-                                if (index2 + index4 + 10 >= num1)
-                                {
-                                    num2 = index4;
-                                    break;
-                                }
-                                if (__instance.buffer[index2 + index4] != 0)
-                                {
-                                    num2 = index4;
-                                    break;
-                                }
-                            }
-                            if (num2 < 10)
-                            {
-                                num2 = 10;
-                            }
-                        }
-                        int num3 = 0;
-                    label_54:
-                        while (num3 < num2)
-                        {
-                            int num4 = num1 - index2;
-                            if (num4 >= 10)
+                            int num3 = num1 - index2;
+                            if (num3 >= 10)
                             {
                                 int length = 0;
-                                for (int index5 = 0; index5 < num2 - num3; ++index5)
-                                {
-                                    int index6 = num1 - 1 - index5;
-                                    if (__instance.buffer[index6] == 0)
-                                    {
-                                        ++length;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
+                                for (int index4 = 0; index4 < speed - num2 && __instance.buffer[num1 - 1 - index4] == (byte)0; ++index4)
+                                    ++length;
                                 if (length > 0)
                                 {
-                                    Array.Copy(__instance.buffer, index2, __instance.buffer, index2 + length, num4 - length);
-                                    Array.Clear(__instance.buffer, index2, length);
-                                    num3 += length;
+                                    Array.Copy((Array)__instance.buffer, index2, (Array)__instance.buffer, index2 + length, num3 - length);
+                                    Array.Clear((Array)__instance.buffer, index2, length);
+                                    num2 += length;
                                 }
-                                int index7 = num1 - 1;
+                                int index5 = num1 - 1;
                                 while (true)
                                 {
-                                    if (index7 >= 0 && __instance.buffer[index7] != 0)
+                                    if (index5 >= 0 && __instance.buffer[index5] != (byte)0)
                                     {
                                         --num1;
-                                        --index7;
+                                        --index5;
                                     }
                                     else
-                                    {
-                                        goto label_54;
-                                    }
+                                        goto label_41;
                                 }
                             }
                             else
-                            {
                                 break;
-                            }
                         }
-                        int num5 = index2 + (num3 == 0 ? 1 : num3);
-                        if (num1 > num5)
-                        {
-                            num1 = num5;
-                        }
+                        int num4 = index2 + (num2 == 0 ? 1 : num2);
+                        if (num1 > num4)
+                            num1 = num4;
                     }
                 }
             }
