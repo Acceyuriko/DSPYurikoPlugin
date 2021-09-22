@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
@@ -187,11 +186,11 @@ namespace DSPYurikoPlugin
             int timeSpend = __instance.timeSpend;
             if (__instance.recipeType == ERecipeType.Smelt)
             {
-                timeSpend /= 2;
+                timeSpend /= 10;
             }
             else if (__instance.recipeType == ERecipeType.Assemble)
             {
-                timeSpend /= 2;
+                timeSpend /= 10;
             }
             else if (__instance.recipeType == ERecipeType.Chemical)
             {
@@ -1095,10 +1094,49 @@ namespace DSPYurikoPlugin
             {
                 veinSet.Add(veinPool[i].productId);
             }
+
             int[] productRegister = (int[])null;
             if (GameMain.statistics.production.factoryStatPool[__instance.factory.index] != null)
             {
                 productRegister = GameMain.statistics.production.factoryStatPool[__instance.factory.index].productRegister;
+            }
+            Dictionary<int, List<int[]>> localResourceSupply = new Dictionary<int, List<int[]>>();
+            for (int stationIndex = 1; stationIndex < __instance.planet.factory.transport.stationCursor; ++stationIndex)
+            {
+                var station = __instance.planet.factory.transport.stationPool[stationIndex];
+                if (station != null && station.storage != null)
+                {
+                    for (int storageIndex = 0; storageIndex < station.storage.Length; ++storageIndex)
+                    {
+                        var stationStore = station.storage[storageIndex];
+
+                        if (veinSet.Contains(stationStore.itemId) || stationStore.itemId == __instance.planet.waterItemId)
+                        {
+                            if (stationStore.count < stationStore.max)
+                            {
+                                float amount = 0f;
+                                amount += ticks;
+                                amount *= ratio * GameMain.history.miningSpeedScale;
+                                station.storage[storageIndex].count += (int)amount;
+                                if (productRegister != null)
+                                {
+                                    productRegister[stationStore.itemId] += (int)amount;
+                                }
+                            }
+                        }
+                        else 
+                        {
+                            // todo: 检查是否是本地供应
+                            if (stationStore.itemId != 0)
+                            {
+                                if (!localResourceSupply.ContainsKey(stationStore.itemId)) {
+                                    localResourceSupply.Add(stationStore.itemId, new List<int[]>());
+                                }
+                                localResourceSupply[stationStore.itemId].Append(new int[]{ stationIndex, storageIndex });
+                            }
+                        }
+                    }
+                }
             }
             for (int stationIndex = 1; stationIndex < __instance.planet.factory.transport.stationCursor; ++stationIndex)
             {
@@ -1108,17 +1146,25 @@ namespace DSPYurikoPlugin
                     for (int storageIndex = 0; storageIndex < station.storage.Length; ++storageIndex)
                     {
                         var stationStore = station.storage[storageIndex];
-                        if (stationStore.count < stationStore.max)
+                        // todo: 检查是否是本地需求
+                        if (stationStore.itemId != 0 && !veinSet.Contains(stationStore.itemId) && stationStore.itemId != __instance.planet.waterItemId)
                         {
-                            float amount = 0f;
-                            if (veinSet.Contains(stationStore.itemId) || stationStore.itemId == __instance.planet.waterItemId)
+                            if (localResourceSupply.Contains(stationStore.itemId))
                             {
+                                float amount = 0;
                                 amount += ticks;
-                                amount *= ratio * GameMain.history.miningSpeedScale;
-                                station.storage[storageIndex].count += (int)amount;
-                                if (productRegister != null)
+                                amount *= ratio;
+                                foreach (var indexs in localResourceSupply[stationStore.itemId])
                                 {
-                                    productRegister[stationStore.itemId] += (int)amount;
+                                    var storeToSupply = __instance.planet.factory.transport.stationPool[indexs[0]].storage[indexs[1]];
+                                    int eachAmount = (int)Math.Min(amount, (float)storeToSupply.count);
+                                    stationStore.count += eachAmount;
+                                    storeToSupply.count -= eachAmount;
+                                    amount -= eachAmount;
+                                    if (amount <= 0)
+                                    {
+                                        break;
+                                    }
                                 }
                             }
                         }
