@@ -599,7 +599,7 @@ namespace DSPYurikoPlugin
        int[] consumeRegister
        )
     {
-      int ratio = 2;
+      int ratio = 10;
       int coldSpend = __instance.coldSpend / ratio;
       int chargeSpend = __instance.chargeSpend / ratio;
       if (__instance.needs == null)
@@ -790,7 +790,7 @@ namespace DSPYurikoPlugin
         int[] consumeRegister
         )
     {
-      int ratio = 2;
+      int ratio = 10;
       int coldSpend = __instance.coldSpend / ratio;
       int chargeSpend = __instance.chargeSpend / ratio;
 
