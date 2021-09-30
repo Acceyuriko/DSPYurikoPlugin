@@ -1055,7 +1055,7 @@ namespace DSPYurikoPlugin
     [HarmonyPatch(typeof(StationComponent), "InternalTickLocal")]
     public static bool StationInternalTickLocalPatch(ref float dt)
     {
-      dt *= 2;
+      // dt *= 2;
       return true;
     }
 
@@ -1067,8 +1067,7 @@ namespace DSPYurikoPlugin
         ref float shipSailSpeed,
         ref float shipWarpSpeed)
     {
-      int ratio = 2;
-      dt *= ratio;
+      int ratio = 10;
       shipSailSpeed *= ratio;
       shipWarpSpeed *= ratio;
       return true;
@@ -1115,7 +1114,7 @@ namespace DSPYurikoPlugin
         int[] productRegister,
         int[] consumeRegister)
     {
-      int ratio = 2;
+      int ratio = 10;
       if (__instance.catalystPoint > 0)
       {
         int num1 = __instance.catalystPoint / 3600;
@@ -1276,6 +1275,10 @@ namespace DSPYurikoPlugin
         ref var station = ref __instance.planet.factory.transport.stationPool[stationIndex];
         if (station != null && station.storage != null)
         {
+          // 填满翘曲
+          if (station.warperCount < station.warperMaxCount) {
+            station.warperCount = station.warperMaxCount;
+          }
           for (int storageIndex = 0; storageIndex < station.storage.Length; ++storageIndex)
           {
             ref var stationStore = ref station.storage[storageIndex];
