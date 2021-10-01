@@ -1240,6 +1240,23 @@ namespace DSPYurikoPlugin
       return false;
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DysonNode), "OrderConstructCp")]
+    public static bool DysonNodeOrderConstructCpPatch(
+      ref DysonNode __instance,
+      long gameTick,
+      DysonSwarm swarm
+    )
+    {
+      for (var i = 0; i < 10; i++)
+      {
+        if (__instance.cpReqOrder <= 0 || !swarm.AbsorbSail(__instance, gameTick))
+          return false;
+        ++__instance.cpOrdered;
+      }
+      return false;
+    }
+
     // 星球矿机
     [HarmonyPostfix]
     [HarmonyPatch(typeof(FactorySystem), "CheckBeforeGameTick")]
@@ -1276,7 +1293,8 @@ namespace DSPYurikoPlugin
         if (station != null && station.storage != null)
         {
           // 填满翘曲
-          if (station.warperCount < station.warperMaxCount) {
+          if (station.warperCount < station.warperMaxCount)
+          {
             station.warperCount = station.warperMaxCount;
           }
           for (int storageIndex = 0; storageIndex < station.storage.Length; ++storageIndex)
