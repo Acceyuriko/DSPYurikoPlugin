@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
@@ -1370,6 +1371,687 @@ namespace DSPYurikoPlugin
       }
     }
 
+    // 异常检测
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(GameAbnormalityCheck), "isGameNormal")]
+    public static bool GameAbnormalityCheckPatch(ref bool __result)
+    {
+      __result = true;
+      return false;
+    }
+
+    // 游戏数据
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(GameMain), "Begin")]
+    public static void GameMainBeginPatch()
+    {
+      if (DSPGame.IsMenuDemo)
+      {
+        return;
+      }
+      // var logger = BepInEx.Logging.Logger.CreateLogSource("YurikoGameMainBegin");
+      foreach (var tech in LDB._techs.dataArray)
+      {
+        var ts = GameMain.history.TechState(tech.ID);
+        if (!ts.unlocked)
+        {
+          if (ts.curLevel >= ts.maxLevel)
+          {
+            ts.curLevel = ts.maxLevel;
+            ts.hashUploaded = ts.hashNeeded;
+            ts.unlocked = true;
+          }
+          else
+          {
+            ++ts.curLevel;
+            ts.hashUploaded = 0L;
+            ts.hashNeeded = tech.GetHashNeeded(ts.curLevel);
+          }
+          GameMain.history.techStates[tech.ID] = ts;
+          for (int index = 0; index < tech.UnlockRecipes.Length; ++index)
+          {
+            GameMain.history.UnlockRecipe(tech.UnlockRecipes[index]);
+          }
+          for (int index = 0; index < tech.UnlockFunctions.Length; ++index)
+          {
+            GameMain.history.UnlockTechFunction(tech.UnlockFunctions[index], tech.UnlockValues[index], ts.curLevel);
+          }
+          for (int index = 0; index < tech.AddItems.Length; ++index)
+          {
+            GameMain.history.GainTechAwards(tech.AddItems[index], tech.AddItemCounts[index]);
+          }
+          if (tech.ID > 1)
+          {
+            GameMain.history.RegFeatureKey(1000100);
+          }
+        }
+      }
+    }
+
+    // 创建行星
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlanetGen), "CreatePlanet")]
+    public static bool PlanetGenCreatePlanetPatch(
+      ref PlanetData __result,
+      GalaxyData galaxy,
+      StarData star,
+      int[] themeIds,
+      int index,
+      int orbitAround,
+      int orbitIndex,
+      int number,
+      bool gasGiant,
+      int info_seed,
+      int gen_seed
+    )
+    {
+      PlanetData planet = new PlanetData();
+      DotNet35Random dotNet35Random = new DotNet35Random(info_seed);
+      planet.index = index;
+      planet.galaxy = star.galaxy;
+      planet.star = star;
+      planet.seed = gen_seed;
+      planet.infoSeed = info_seed;
+      planet.orbitAround = orbitAround;
+      planet.orbitIndex = orbitIndex;
+      planet.number = number;
+      planet.id = star.id * 100 + index + 1;
+      StarData[] stars = galaxy.stars;
+      int num1 = 0;
+      for (int index1 = 0; index1 < star.index; ++index1)
+        num1 += stars[index1].planetCount;
+      int num2 = num1 + index;
+      if (orbitAround > 0)
+      {
+        for (int index2 = 0; index2 < star.planetCount; ++index2)
+        {
+          if (orbitAround == star.planets[index2].number && star.planets[index2].orbitAround == 0)
+          {
+            planet.orbitAroundPlanet = star.planets[index2];
+            if (orbitIndex > 1)
+            {
+              planet.orbitAroundPlanet.singularity |= EPlanetSingularity.MultipleSatellites;
+              break;
+            }
+            break;
+          }
+        }
+        Assert.NotNull((object)planet.orbitAroundPlanet);
+      }
+      string str = star.planetCount > 20 ? (index + 1).ToString() : NameGen.roman[index + 1];
+      planet.name = star.name + " " + str + "号星".Translate();
+      double num3 = dotNet35Random.NextDouble();
+      double num4 = dotNet35Random.NextDouble();
+      double num5 = dotNet35Random.NextDouble();
+      double num6 = dotNet35Random.NextDouble();
+      double num7 = dotNet35Random.NextDouble();
+      double num8 = dotNet35Random.NextDouble();
+      double num9 = dotNet35Random.NextDouble();
+      double num10 = dotNet35Random.NextDouble();
+      double num11 = dotNet35Random.NextDouble();
+      double num12 = dotNet35Random.NextDouble();
+      double num13 = dotNet35Random.NextDouble();
+      double num14 = dotNet35Random.NextDouble();
+      double rand1 = dotNet35Random.NextDouble();
+      double num15 = dotNet35Random.NextDouble();
+      double rand2 = dotNet35Random.NextDouble();
+      double rand3 = dotNet35Random.NextDouble();
+      double rand4 = dotNet35Random.NextDouble();
+      int theme_seed = dotNet35Random.Next();
+      float a = Mathf.Pow(1.2f, (float)(num3 * (num4 - 0.5) * 0.5));
+      float f1;
+      if (orbitAround == 0)
+      {
+        float b = StarGen.orbitRadius[orbitIndex] * star.orbitScaler;
+        float num16 = (float)(((double)a - 1.0) / (double)Mathf.Max(1f, b) + 1.0);
+        f1 = b * num16;
+      }
+      else
+        f1 = (float)(((1600.0 * (double)orbitIndex + 200.0) * (double)Mathf.Pow(star.orbitScaler, 0.3f) * (double)Mathf.Lerp(a, 1f, 0.5f) + (double)planet.orbitAroundPlanet.realRadius) / 40000.0);
+      planet.orbitRadius = f1;
+      planet.orbitInclination = (float)(num5 * 16.0 - 8.0);
+      if (orbitAround > 0)
+        planet.orbitInclination *= 2.2f;
+      planet.orbitLongitude = (float)(num6 * 360.0);
+      if (star.type >= EStarType.NeutronStar)
+      {
+        if ((double)planet.orbitInclination > 0.0)
+          planet.orbitInclination += 3f;
+        else
+          planet.orbitInclination -= 3f;
+      }
+      planet.orbitalPeriod = planet.orbitAroundPlanet != null ? Math.Sqrt(39.4784176043574 * (double)f1 * (double)f1 * (double)f1 / 1.08308421068537E-08) : Math.Sqrt(39.4784176043574 * (double)f1 * (double)f1 * (double)f1 / (1.35385519905204E-06 * (double)star.mass));
+      planet.orbitPhase = (float)(num7 * 360.0);
+      if (num15 < 0.0399999991059303)
+      {
+        planet.obliquity = (float)(num8 * (num9 - 0.5) * 39.9);
+        if ((double)planet.obliquity < 0.0)
+          planet.obliquity -= 70f;
+        else
+          planet.obliquity += 70f;
+        planet.singularity |= EPlanetSingularity.LaySide;
+      }
+      else if (num15 < 0.100000001490116)
+      {
+        planet.obliquity = (float)(num8 * (num9 - 0.5) * 80.0);
+        if ((double)planet.obliquity < 0.0)
+          planet.obliquity -= 30f;
+        else
+          planet.obliquity += 30f;
+      }
+      else
+        planet.obliquity = (float)(num8 * (num9 - 0.5) * 60.0);
+      planet.rotationPeriod = (num10 * num11 * 1000.0 + 400.0) * (orbitAround == 0 ? (double)Mathf.Pow(f1, 0.25f) : 1.0) * (gasGiant ? 0.200000002980232 : 1.0);
+      if (!gasGiant)
+      {
+        if (star.type == EStarType.WhiteDwarf)
+          planet.rotationPeriod *= 0.5;
+        else if (star.type == EStarType.NeutronStar)
+          planet.rotationPeriod *= 0.200000002980232;
+        else if (star.type == EStarType.BlackHole)
+          planet.rotationPeriod *= 0.150000005960464;
+      }
+      planet.rotationPhase = (float)(num12 * 360.0);
+      planet.sunDistance = orbitAround == 0 ? planet.orbitRadius : planet.orbitAroundPlanet.orbitRadius;
+      planet.scale = 1f;
+      double num17 = orbitAround == 0 ? planet.orbitalPeriod : planet.orbitAroundPlanet.orbitalPeriod;
+      planet.rotationPeriod = 1.0 / (1.0 / num17 + 1.0 / planet.rotationPeriod);
+      if (orbitAround == 0 && orbitIndex <= 4 && !gasGiant)
+      {
+        if (num15 > 0.959999978542328)
+        {
+          planet.obliquity *= 0.01f;
+          planet.rotationPeriod = planet.orbitalPeriod;
+          planet.singularity |= EPlanetSingularity.TidalLocked;
+        }
+        else if (num15 > 0.930000007152557)
+        {
+          planet.obliquity *= 0.1f;
+          planet.rotationPeriod = planet.orbitalPeriod * 0.5;
+          planet.singularity |= EPlanetSingularity.TidalLocked2;
+        }
+        else if (num15 > 0.899999976158142)
+        {
+          planet.obliquity *= 0.2f;
+          planet.rotationPeriod = planet.orbitalPeriod * 0.25;
+          planet.singularity |= EPlanetSingularity.TidalLocked4;
+        }
+      }
+      if (num15 > 0.85 && num15 <= 0.9)
+      {
+        planet.rotationPeriod = -planet.rotationPeriod;
+        planet.singularity |= EPlanetSingularity.ClockwiseRotate;
+      }
+      planet.runtimeOrbitRotation = Quaternion.AngleAxis(planet.orbitLongitude, Vector3.up) * Quaternion.AngleAxis(planet.orbitInclination, Vector3.forward);
+      if (planet.orbitAroundPlanet != null)
+        planet.runtimeOrbitRotation = planet.orbitAroundPlanet.runtimeOrbitRotation * planet.runtimeOrbitRotation;
+      planet.runtimeSystemRotation = planet.runtimeOrbitRotation * Quaternion.AngleAxis(planet.obliquity, Vector3.forward);
+      float habitableRadius = star.habitableRadius;
+      if (gasGiant)
+      {
+        planet.type = EPlanetType.Gas;
+        planet.radius = 80f;
+        planet.scale = 10f;
+        planet.habitableBias = 100f;
+      }
+      else
+      {
+        float num18 = Mathf.Ceil((float)star.galaxy.starCount * 0.29f);
+        if ((double)num18 < 11.0)
+          num18 = 11f;
+        double num19 = (double)num18 - (double)star.galaxy.habitableCount;
+        float num20 = (float)(star.galaxy.starCount - star.index);
+        float sunDistance = planet.sunDistance;
+        float num21 = 1000f;
+        float f2 = 1000f;
+        if ((double)habitableRadius > 0.0 && (double)sunDistance > 0.0)
+        {
+          f2 = sunDistance / habitableRadius;
+          num21 = Mathf.Abs(Mathf.Log(f2));
+        }
+        float num22 = Mathf.Clamp(Mathf.Sqrt(habitableRadius), 1f, 2f) - 0.04f;
+        double num23 = (double)num20;
+        float num24 = Mathf.Clamp(Mathf.Lerp((float)(num19 / num23), 0.35f, 0.5f), 0.08f, 0.8f);
+        planet.habitableBias = num21 * num22;
+        planet.temperatureBias = (float)(1.20000004768372 / ((double)f2 + 0.200000002980232) - 1.0);
+        float num25 = Mathf.Pow(Mathf.Clamp01(planet.habitableBias / num24), num24 * 10f);
+        if (num13 > (double)num25 && star.index > 0 || planet.orbitAround > 0 && planet.orbitIndex == 1 && star.index == 0)
+        {
+          planet.type = EPlanetType.Ocean;
+          ++star.galaxy.habitableCount;
+        }
+        else if ((double)f2 < 0.833333015441895)
+        {
+          float num26 = Mathf.Max(0.15f, (float)((double)f2 * 2.5 - 0.850000023841858));
+          planet.type = num14 >= (double)num26 ? EPlanetType.Vocano : EPlanetType.Desert;
+        }
+        else if ((double)f2 < 1.20000004768372)
+        {
+          planet.type = EPlanetType.Desert;
+        }
+        else
+        {
+          float num27 = (float)(0.899999976158142 / (double)f2 - 0.100000001490116);
+          planet.type = num14 >= (double)num27 ? EPlanetType.Ice : EPlanetType.Desert;
+        }
+        planet.radius = 200f;
+      }
+      if (planet.type != EPlanetType.Gas && planet.type != EPlanetType.None)
+      {
+        planet.precision = 200;
+        planet.segment = 5;
+      }
+      else
+      {
+        planet.precision = 64;
+        planet.segment = 2;
+      }
+      planet.luminosity = Mathf.Pow(planet.star.lightBalanceRadius / (planet.sunDistance + 0.01f), 0.6f);
+      if ((double)planet.luminosity > 1.0)
+      {
+        planet.luminosity = Mathf.Log(planet.luminosity) + 1f;
+        planet.luminosity = Mathf.Log(planet.luminosity) + 1f;
+        planet.luminosity = Mathf.Log(planet.luminosity) + 1f;
+      }
+      planet.luminosity = Mathf.Round(planet.luminosity * 100f) / 100f;
+      PlanetGen.SetPlanetTheme(planet, themeIds, rand1, rand2, rand3, rand4, theme_seed);
+      star.galaxy.astroPoses[planet.id].uRadius = planet.realRadius;
+      planet.radius *= 2;
+      __result = planet;
+      return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(StarGen), "CreateStar")]
+    public static bool StarGenCreateStarPatch(
+      ref StarData __result,
+      GalaxyData galaxy,
+      VectorLF3 pos,
+      int id,
+      int seed,
+      EStarType needtype,
+      ESpectrType needSpectr = ESpectrType.X
+    )
+    {
+      StarData starData = new StarData()
+      {
+        galaxy = galaxy,
+        index = id - 1
+      };
+      starData.level = galaxy.starCount <= 1 ? 0.0f : (float)starData.index / (float)(galaxy.starCount - 1);
+      starData.id = id;
+      starData.seed = seed;
+      DotNet35Random dotNet35Random1 = new DotNet35Random(seed);
+      int seed1 = dotNet35Random1.Next();
+      int Seed = dotNet35Random1.Next();
+      starData.position = pos;
+      float num1 = (float)pos.magnitude / 32f;
+      if ((double)num1 > 1.0)
+        num1 = Mathf.Log(Mathf.Log(Mathf.Log(Mathf.Log(Mathf.Log(num1) + 1f) + 1f) + 1f) + 1f) + 1f;
+      starData.resourceCoef = Mathf.Pow(7f, num1) * 0.6f;
+      DotNet35Random dotNet35Random2 = new DotNet35Random(Seed);
+      double r1 = dotNet35Random2.NextDouble();
+      double r2 = dotNet35Random2.NextDouble();
+      double num2 = dotNet35Random2.NextDouble();
+      double rn = dotNet35Random2.NextDouble();
+      double rt = dotNet35Random2.NextDouble();
+      double num3 = (dotNet35Random2.NextDouble() - 0.5) * 0.2;
+      double num4 = dotNet35Random2.NextDouble() * 0.2 + 0.9;
+      double y = dotNet35Random2.NextDouble() * 0.4 - 0.2;
+      double num5 = Math.Pow(2.0, y);
+      float num6 = Mathf.Lerp(-0.98f, 0.88f, starData.level);
+      float averageValue = (double)num6 >= 0.0 ? num6 + 0.65f : num6 - 0.65f;
+      float standardDeviation = 0.33f;
+      if (needtype == EStarType.GiantStar)
+      {
+        averageValue = y > -0.08 ? -1.5f : 1.6f;
+        standardDeviation = 0.3f;
+      }
+      MethodInfo randNormal = typeof(StarGen).GetMethod("RandNormal", BindingFlags.NonPublic | BindingFlags.Static);
+      float num7 = (float)randNormal.Invoke(null, new object[] { averageValue, standardDeviation, r1, r2 });
+      switch (needSpectr)
+      {
+        case ESpectrType.M:
+          num7 = -3f;
+          break;
+        case ESpectrType.O:
+          num7 = 3f;
+          break;
+      }
+      float p1 = (float)((double)Mathf.Clamp((double)num7 <= 0.0 ? num7 * 1f : num7 * 2f, -2.4f, 4.65f) + num3 + 1.0);
+      switch (needtype)
+      {
+        case EStarType.WhiteDwarf:
+          starData.mass = (float)(1.0 + r2 * 5.0);
+          break;
+        case EStarType.NeutronStar:
+          starData.mass = (float)(7.0 + r1 * 11.0);
+          break;
+        case EStarType.BlackHole:
+          starData.mass = (float)(18.0 + r1 * r2 * 30.0);
+          break;
+        default:
+          starData.mass = Mathf.Pow(2f, p1);
+          break;
+      }
+      double d = 5.0;
+      if ((double)starData.mass < 2.0)
+        d = 2.0 + 0.4 * (1.0 - (double)starData.mass);
+      starData.lifetime = (float)(10000.0 * Math.Pow(0.1, Math.Log10((double)starData.mass * 0.5) / Math.Log10(d) + 1.0) * num4);
+      switch (needtype)
+      {
+        case EStarType.GiantStar:
+          starData.lifetime = (float)(10000.0 * Math.Pow(0.1, Math.Log10((double)starData.mass * 0.58) / Math.Log10(d) + 1.0) * num4);
+          starData.age = (float)(num2 * 0.0399999991059303 + 0.959999978542328);
+          break;
+        case EStarType.WhiteDwarf:
+        case EStarType.NeutronStar:
+        case EStarType.BlackHole:
+          starData.age = (float)(num2 * 0.400000005960464 + 1.0);
+          if (needtype == EStarType.WhiteDwarf)
+          {
+            starData.lifetime += 10000f;
+            break;
+          }
+          if (needtype == EStarType.NeutronStar)
+          {
+            starData.lifetime += 1000f;
+            break;
+          }
+          break;
+        default:
+          starData.age = (double)starData.mass >= 0.5 ? ((double)starData.mass >= 0.8 ? (float)(num2 * 0.699999988079071 + 0.200000002980232) : (float)(num2 * 0.400000005960464 + 0.100000001490116)) : (float)(num2 * 0.119999997317791 + 0.0199999995529652);
+          break;
+      }
+      float num8 = starData.lifetime * starData.age;
+      if ((double)num8 > 5000.0)
+        num8 = (float)(((double)Mathf.Log(num8 / 5000f) + 1.0) * 5000.0);
+      if ((double)num8 > 8000.0)
+        num8 = (float)(((double)Mathf.Log(Mathf.Log(Mathf.Log(num8 / 8000f) + 1f) + 1f) + 1.0) * 8000.0);
+      starData.lifetime = num8 / starData.age;
+      float f = (float)(1.0 - (double)Mathf.Pow(Mathf.Clamp01(starData.age), 20f) * 0.5) * starData.mass;
+      starData.temperature = (float)(Math.Pow((double)f, 0.56 + 0.14 / (Math.Log10((double)f + 4.0) / Math.Log10(5.0))) * 4450.0 + 1300.0);
+      double num9 = Math.Log10(((double)starData.temperature - 1300.0) / 4500.0) / Math.Log10(2.6) - 0.5;
+      if (num9 < 0.0)
+      {
+        num9 *= 4.0;
+      }
+      if (num9 > 2.0)
+        num9 = 2.0;
+      else if (num9 < -4.0)
+        num9 = -4.0;
+      starData.spectr = (ESpectrType)Mathf.RoundToInt((float)num9 + 4f);
+      starData.color = Mathf.Clamp01((float)((num9 + 3.5) * 0.200000002980232));
+      starData.classFactor = (float)num9;
+      starData.luminosity = Mathf.Pow(f, 0.7f);
+      starData.radius = (float)(Math.Pow((double)starData.mass, 0.4) * num5);
+      starData.acdiskRadius = 0.0f;
+      float p2 = (float)num9 + 2f;
+      starData.habitableRadius = Mathf.Pow(1.7f, p2) + 0.25f * Mathf.Min(1f, starData.orbitScaler);
+      starData.lightBalanceRadius = Mathf.Pow(1.7f, p2);
+      starData.orbitScaler = Mathf.Pow(1.35f, p2);
+      if ((double)starData.orbitScaler < 1.0)
+        starData.orbitScaler = Mathf.Lerp(starData.orbitScaler, 1f, 0.6f);
+      StarGen.SetStarAge(starData, starData.age, rn, rt);
+      starData.dysonRadius = starData.orbitScaler * 0.28f * 1.5f;
+      if ((double)starData.dysonRadius * 40000.0 < (double)starData.physicsRadius * 1.5)
+        starData.dysonRadius = (float)((double)starData.physicsRadius * 1.5 / 40000.0);
+      starData.uPosition = starData.position * 2400000.0;
+      starData.name = NameGen.RandomStarName(seed1, starData, galaxy);
+      starData.overrideName = "";
+      starData.radius *= 4;
+      __result = starData;
+      return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(StarGen), "CreateStarPlanets")]
+    public static bool StarGenCreateStarPlanetsPatch(
+      GalaxyData galaxy,
+      StarData star,
+      GameDesc gameDesc,
+      double[] ___pGas
+    )
+    {
+      DotNet35Random dotNet35Random1 = new DotNet35Random(star.seed);
+      dotNet35Random1.Next();
+      dotNet35Random1.Next();
+      dotNet35Random1.Next();
+      DotNet35Random dotNet35Random2 = new DotNet35Random(dotNet35Random1.Next());
+      double num1 = dotNet35Random2.NextDouble();
+      double num2 = dotNet35Random2.NextDouble();
+      double num3 = dotNet35Random2.NextDouble();
+      double num4 = dotNet35Random2.NextDouble();
+      double num5 = dotNet35Random2.NextDouble();
+      double num6 = dotNet35Random2.NextDouble() * 0.2 + 0.9;
+      double num7 = dotNet35Random2.NextDouble() * 0.2 + 0.9;
+      {
+        Array.Clear((Array)___pGas, 0, ___pGas.Length);
+        star.planetCount = num1 >= 0.1 ? (num1 >= 0.2 ? (num1 >= 0.7 ? (num1 >= 0.95 ? 9 : 8) : 7) : 6) : 5;
+        ___pGas[0] = 0.1;
+        ___pGas[1] = 0.2;
+        ___pGas[2] = 0.25;
+        ___pGas[3] = 0.3;
+        ___pGas[4] = 0.32;
+        ___pGas[5] = 0.35;
+        ___pGas[6] = 0.38;
+        ___pGas[7] = 0.40;
+        ___pGas[8] = 0.42;
+        star.planets = new PlanetData[star.planetCount];
+        int num8 = 0;
+        int num9 = 0;
+        int orbitAround = 0;
+        int num10 = 1;
+        for (int index = 0; index < star.planetCount; ++index)
+        {
+          int info_seed = dotNet35Random2.Next();
+          int gen_seed = dotNet35Random2.Next();
+          double num11 = dotNet35Random2.NextDouble();
+          double num12 = dotNet35Random2.NextDouble();
+          bool gasGiant = false;
+          if (orbitAround == 0)
+          {
+            ++num8;
+            if (index < star.planetCount - 1 && num11 < ___pGas[index])
+            {
+              gasGiant = true;
+              if (num10 < 3)
+                num10 = 3;
+            }
+            for (; star.index != 0 || num10 != 3; ++num10)
+            {
+              int num13 = star.planetCount - index;
+              int num14 = 9 - num10;
+              if (num14 > num13)
+              {
+                float a = (float)num13 / (float)num14;
+                float num15 = num10 <= 3 ? Mathf.Lerp(a, 1f, 0.15f) + 0.01f : Mathf.Lerp(a, 1f, 0.45f) + 0.01f;
+                if (dotNet35Random2.NextDouble() < (double)num15)
+                  goto label_62;
+              }
+              else
+                goto label_62;
+            }
+            gasGiant = true;
+          }
+          else
+          {
+            ++num9;
+            gasGiant = false;
+          }
+        label_62:
+          star.planets[index] = PlanetGen.CreatePlanet(galaxy, star, gameDesc.savedThemeIds, index, orbitAround, orbitAround == 0 ? num10 : num9, orbitAround == 0 ? num8 : num9, gasGiant, info_seed, gen_seed);
+          ++num10;
+          if (gasGiant)
+          {
+            orbitAround = num8;
+            num9 = 0;
+          }
+          if (num9 >= 1 && num12 < 0.8)
+          {
+            orbitAround = 0;
+            num9 = 0;
+          }
+        }
+      }
+      int num16 = 0;
+      int num17 = 0;
+      int index1 = 0;
+      for (int index2 = 0; index2 < star.planetCount; ++index2)
+      {
+        if (star.planets[index2].type == EPlanetType.Gas)
+        {
+          num16 = star.planets[index2].orbitIndex;
+          break;
+        }
+      }
+      for (int index3 = 0; index3 < star.planetCount; ++index3)
+      {
+        if (star.planets[index3].orbitAround == 0)
+          num17 = star.planets[index3].orbitIndex;
+      }
+      if (num16 > 0)
+      {
+        int num18 = num16 - 1;
+        bool flag = true;
+        for (int index4 = 0; index4 < star.planetCount; ++index4)
+        {
+          if (star.planets[index4].orbitAround == 0 && star.planets[index4].orbitIndex == num16 - 1)
+          {
+            flag = false;
+            break;
+          }
+        }
+        if (flag && num4 < 0.2 + (double)num18 * 0.2)
+          index1 = num18;
+      }
+      int index5 = num5 >= 0.2 ? (num5 >= 0.4 ? (num5 >= 0.8 ? 0 : num17 + 1) : num17 + 2) : num17 + 3;
+      if (index5 != 0 && index5 < 5)
+        index5 = 5;
+      star.asterBelt1OrbitIndex = (float)index1;
+      star.asterBelt2OrbitIndex = (float)index5;
+      if (index1 > 0)
+        star.asterBelt1Radius = StarGen.orbitRadius[index1] * (float)num6 * star.orbitScaler;
+      if (index5 <= 0)
+        return false;
+      star.asterBelt2Radius = StarGen.orbitRadius[index5] * (float)num7 * star.orbitScaler;
+      return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(UniverseGen), "CreateGalaxy")]
+    public static bool UniverseGenCreateGalaxyPatch(
+      ref GalaxyData __result,
+      ref GameDesc gameDesc,
+      ref List<VectorLF3> ___tmp_poses
+    )
+    {
+      int galaxyAlgo = gameDesc.galaxyAlgo;
+      int galaxySeed = gameDesc.galaxySeed;
+      int starCount = gameDesc.starCount;
+      if (galaxyAlgo < 20200101 || galaxyAlgo > 20591231)
+        throw new Exception("Wrong version of unigen algorithm!");
+      DotNet35Random dotNet35Random = new DotNet35Random(galaxySeed);
+      MethodInfo generateTempPoses = typeof(UniverseGen).GetMethod("GenerateTempPoses", BindingFlags.NonPublic | BindingFlags.Static);
+      double density = 1;
+      int tempPoses = (int)generateTempPoses.Invoke(
+        null,
+        new object[] {
+          dotNet35Random.Next(),
+          starCount,
+          4,
+          2.0 / density,
+          2.3 / density,
+          3.5 / density,
+          0.18
+        }
+      );
+      GalaxyData galaxy = new GalaxyData();
+      galaxy.seed = galaxySeed;
+      galaxy.starCount = tempPoses;
+      galaxy.stars = new StarData[tempPoses];
+      Assert.Positive(tempPoses);
+      if (tempPoses <= 0)
+      {
+        __result = galaxy;
+        return false;
+      }
+      float num1 = (float)dotNet35Random.NextDouble();
+      float num2 = (float)dotNet35Random.NextDouble();
+      float num3 = (float)dotNet35Random.NextDouble();
+      float num4 = (float)dotNet35Random.NextDouble();
+      int num5 = Mathf.CeilToInt((float)(0.00999999977648258 * (double)tempPoses + (double)num1 * 0.300000011920929));
+      int num6 = Mathf.CeilToInt((float)(0.00999999977648258 * (double)tempPoses + (double)num2 * 0.300000011920929));
+      int num7 = Mathf.CeilToInt((float)(0.0160000007599592 * (double)tempPoses + (double)num3 * 0.400000005960464));
+      int num8 = Mathf.CeilToInt((float)(0.0130000002682209 * (double)tempPoses + (double)num4 * 1.39999997615814));
+      int num9 = tempPoses - num5;
+      int num10 = num9 - num6;
+      int num11 = num10 - num7;
+      int num12 = (num11 - 1) / num8 / 4;
+      int num13 = 0;
+      for (int index = 0; index < tempPoses; ++index)
+      {
+        ESpectrType needSpectr = ESpectrType.X;
+        double p = dotNet35Random.NextDouble();
+        if (p > 0.85)
+        {
+          needSpectr = ESpectrType.O;
+        }
+
+        EStarType needtype = EStarType.MainSeqStar;
+        if (index % num12 == num13)
+          needtype = EStarType.GiantStar;
+        if (index >= num9)
+          needtype = EStarType.BlackHole;
+        else if (index >= num10)
+          needtype = EStarType.NeutronStar;
+        else if (index >= num11)
+          needtype = EStarType.WhiteDwarf;
+
+        galaxy.stars[index] = StarGen.CreateStar(galaxy, ___tmp_poses[index], index + 1, dotNet35Random.Next(), needtype, needSpectr);
+      }
+      AstroPose[] astroPoses = galaxy.astroPoses;
+      StarData[] stars = galaxy.stars;
+      for (int index = 0; index < galaxy.astroPoses.Length; ++index)
+      {
+        astroPoses[index].uRot.w = 1f;
+        astroPoses[index].uRotNext.w = 1f;
+      }
+      for (int index = 0; index < tempPoses; ++index)
+      {
+        StarGen.CreateStarPlanets(galaxy, stars[index], gameDesc);
+        astroPoses[stars[index].id * 100].uPos = astroPoses[stars[index].id * 100].uPosNext = stars[index].uPosition;
+        astroPoses[stars[index].id * 100].uRot = astroPoses[stars[index].id * 100].uRotNext = Quaternion.identity;
+        astroPoses[stars[index].id * 100].uRadius = stars[index].physicsRadius;
+      }
+      galaxy.UpdatePoses(0.0);
+      galaxy.birthPlanetId = 0;
+      if (tempPoses > 0)
+      {
+        StarData starData = stars[0];
+        for (int index = 0; index < starData.planetCount; ++index)
+        {
+          PlanetData planet = starData.planets[index];
+          ThemeProto themeProto = LDB.themes.Select(planet.theme);
+          if (themeProto != null && themeProto.Distribute == EThemeDistribute.Birth)
+          {
+            galaxy.birthPlanetId = planet.id;
+            galaxy.birthStarId = starData.id;
+            break;
+          }
+        }
+      }
+      Assert.Positive(galaxy.birthPlanetId);
+      for (int index1 = 0; index1 < tempPoses; ++index1)
+      {
+        StarData star = galaxy.stars[index1];
+        for (int index2 = 0; index2 < star.planetCount; ++index2)
+          PlanetModelingManager.Algorithm(star.planets[index2]).GenerateVeins(true);
+      }
+      UniverseGen.CreateGalaxyStarGraph(galaxy);
+      __result = galaxy;
+      return false;
+    }
 
     private static Dictionary<int, ulong> frames = new Dictionary<int, ulong>();
     private static bool InserterUpdateCommonPatch(
