@@ -64,7 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="YurikoPlugin.cs" />
+    <Compile Include="util/YurikoConstants.cs" />
+    <Compile Include="util/YurikoLogging.cs" />
     <Compile Include="patch/GameMain.cs" />
+    <Compile Include="patch/GameHistoryData.cs" />
     <Compile Include="patch/StorageComponent.cs" />
     <Compile Include="patch/CargoPath.cs" />
     <Compile Include="patch/InserterComponent.cs" />
@@ -74,6 +77,7 @@
     <Compile Include="patch/EjectorComponent.cs" />
     <Compile Include="patch/SiloComponent.cs" />
     <Compile Include="patch/StationComponent.cs" />
+    <Compile Include="patch/PowerSystem.cs" />
     <Compile Include="patch/PowerGeneratorComponent.cs" />
     <Compile Include="patch/DysonNode.cs" />
     <Compile Include="patch/FactorySystem.cs" />
@@ -81,6 +85,7 @@
     <Compile Include="patch/PlanetGen.cs" />
     <Compile Include="patch/StarGen.cs" />
     <Compile Include="patch/UniverseGen.cs" />
+    <Compile Include="patch/Mecha.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

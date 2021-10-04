@@ -8,7 +8,7 @@ namespace DSPYurikoPlugin
   {
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlanetGen), "CreatePlanet")]
-    public static bool PlanetGenCreatePlanetPatch(
+    public static bool CreatePlanet(
       ref PlanetData __result,
       GalaxyData galaxy,
       StarData star,
@@ -231,9 +231,9 @@ namespace DSPYurikoPlugin
         planet.luminosity = Mathf.Log(planet.luminosity) + 1f;
       }
       planet.luminosity = Mathf.Round(planet.luminosity * 100f) / 100f;
+      planet.radius *= 2;
       PlanetGen.SetPlanetTheme(planet, themeIds, rand1, rand2, rand3, rand4, theme_seed);
       star.galaxy.astroPoses[planet.id].uRadius = planet.realRadius;
-      planet.radius *= 2;
       __result = planet;
       return false;
     }

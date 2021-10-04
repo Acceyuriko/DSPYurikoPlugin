@@ -10,6 +10,7 @@ namespace DSPYurikoPlugin
     {
       Harmony.CreateAndPatchAll(typeof(YurikoPlugin));
       Harmony.CreateAndPatchAll(typeof(GameMainPatch));
+      Harmony.CreateAndPatchAll(typeof(GameHistoryDataPatch));
       Harmony.CreateAndPatchAll(typeof(StorageComponentPatch));
       Harmony.CreateAndPatchAll(typeof(CargoPathPatch));
       Harmony.CreateAndPatchAll(typeof(InserterComponentPatch));
@@ -26,6 +27,8 @@ namespace DSPYurikoPlugin
       Harmony.CreateAndPatchAll(typeof(PlanetGenPatch));
       Harmony.CreateAndPatchAll(typeof(StarGenPatch));
       Harmony.CreateAndPatchAll(typeof(UniverseGenPatch));
+      Harmony.CreateAndPatchAll(typeof(PowerSystem));
+      Harmony.CreateAndPatchAll(typeof(MechaPatch));
     }
   }
 }

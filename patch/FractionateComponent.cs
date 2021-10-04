@@ -10,11 +10,11 @@ namespace DSPYurikoPlugin
         typeof(FractionateComponent),
         "InternalUpdate",
         new Type[] {
-                typeof(PlanetFactory),
-                typeof(float),
-                typeof(SignData[]),
-                typeof(int[]),
-                typeof(int[])
+          typeof(PlanetFactory),
+          typeof(float),
+          typeof(SignData[]),
+          typeof(int[]),
+          typeof(int[])
         }
     )]
     public static bool FractionateInternalUpdatePatch(
