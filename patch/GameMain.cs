@@ -42,6 +42,18 @@ namespace DSPYurikoPlugin
         {
           factory.planet.factoryModel.RefreshPowerNodes();
         }
+        for (int j = 1; j < factory.powerSystem.genCursor; j++)
+        {
+          ref var node = ref factory.powerSystem.genPool[j];
+          if (node.gamma && node.productId > 0)
+          {
+            var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+            if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerGen)
+            {
+              node.productHeat = proto.prefabDesc.powerProductHeat;
+            }
+          }
+        }
 
         for (int j = 1; j < factory.cargoTraffic.beltCursor; j++)
         {
@@ -49,7 +61,8 @@ namespace DSPYurikoPlugin
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
           if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isBelt)
           {
-            if (node.speed != proto.prefabDesc.beltSpeed) {
+            if (node.speed != proto.prefabDesc.beltSpeed)
+            {
               node.speed = proto.prefabDesc.beltSpeed;
               factory.cargoTraffic.AlterBeltRenderer(j, factory.entityPool, factory.planet.physics.colChunks);
             }
@@ -84,7 +97,8 @@ namespace DSPYurikoPlugin
         for (int j = 1; j < factory.factorySystem.labCursor; j++)
         {
           ref var node = ref factory.factorySystem.labPool[j];
-          if (node.matrixMode) {
+          if (node.matrixMode)
+          {
             var recipeProto = LDB.recipes.Select(node.recipeId);
             if (recipeProto != null)
             {
@@ -93,29 +107,36 @@ namespace DSPYurikoPlugin
           }
         }
 
-        for (int j = 1; j < factory.factorySystem.fractionateCursor; j++) {
+        for (int j = 1; j < factory.factorySystem.fractionateCursor; j++)
+        {
           ref var node = ref factory.factorySystem.fractionatePool[j];
-          if (node.fluidId > 0) {
-            for (int k = 0; k < RecipeProto.fractionateRecipes.Length; k++) {
+          if (node.fluidId > 0)
+          {
+            for (int k = 0; k < RecipeProto.fractionateRecipes.Length; k++)
+            {
               var recipe = RecipeProto.fractionateRecipes[k];
               node.produceProb = (float)recipe.ResultCounts[0] / (float)recipe.ItemCounts[0];
             }
           }
         }
 
-        for (int j = 1; j < factory.factorySystem.ejectorCursor; j++) {
+        for (int j = 1; j < factory.factorySystem.ejectorCursor; j++)
+        {
           ref var node = ref factory.factorySystem.ejectorPool[j];
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isEjector) {
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isEjector)
+          {
             node.coldSpend = proto.prefabDesc.ejectorChargeFrame * 10000;
             node.chargeSpend = proto.prefabDesc.ejectorColdFrame * 10000;
           }
         }
 
-        for (int j = 1; j < factory.factorySystem.siloCursor; j++) {
+        for (int j = 1; j < factory.factorySystem.siloCursor; j++)
+        {
           ref var node = ref factory.factorySystem.siloPool[j];
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isSilo) {
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isSilo)
+          {
             node.coldSpend = proto.prefabDesc.siloColdFrame * 10000;
             node.chargeSpend = proto.prefabDesc.siloChargeFrame * 10000;
           }

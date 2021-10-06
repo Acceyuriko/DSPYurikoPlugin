@@ -72,7 +72,6 @@
     <Compile Include="patch/InserterComponent.cs" />
     <Compile Include="patch/LabComponent.cs" />
     <Compile Include="patch/StationComponent.cs" />
-    <Compile Include="patch/PowerGeneratorComponent.cs" />
     <Compile Include="patch/RecipeProto.cs" />
     <Compile Include="patch/DysonNode.cs" />
     <Compile Include="patch/FactorySystem.cs" />
@@ -81,6 +80,7 @@
     <Compile Include="patch/UniverseGen.cs" />
     <Compile Include="patch/Mecha.cs" />
     <Compile Include="patch/ModelProto.cs" />
+    <Compile Include="patch/PowerGeneratorComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
