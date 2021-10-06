@@ -16,5 +16,13 @@ namespace DSPYurikoPlugin {
         __instance.TimeSpend /= YurikoConstants.RECIPE_TIME_SPEND_RATIO;
       }
     }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RecipeProto), "InitFractionateNeeds")]
+    public static void InitFractionateNeeds() {
+      for (int i = 0; i < RecipeProto.fractionateRecipes.Length; i++) {
+        RecipeProto.fractionateRecipes[i].ResultCounts[0] *= YurikoConstants.RECIPE_FRACTIONATE_RATIO;
+      }
+    }
   }
 }

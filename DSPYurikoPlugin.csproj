@@ -70,7 +70,6 @@
     <Compile Include="patch/GameHistoryData.cs" />
     <Compile Include="patch/StorageComponent.cs" />
     <Compile Include="patch/InserterComponent.cs" />
-    <Compile Include="patch/FractionateComponent.cs" />
     <Compile Include="patch/LabComponent.cs" />
     <Compile Include="patch/EjectorComponent.cs" />
     <Compile Include="patch/SiloComponent.cs" />

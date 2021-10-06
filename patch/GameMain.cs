@@ -90,6 +90,16 @@ namespace DSPYurikoPlugin
             }
           }
         }
+
+        for (int j = 1; j < factory.factorySystem.fractionateCursor; j++) {
+          ref var node = ref factory.factorySystem.fractionatePool[j];
+          if (node.fluidId > 0) {
+            for (int k = 0; k < RecipeProto.fractionateRecipes.Length; k++) {
+              var recipe = RecipeProto.fractionateRecipes[k];
+              node.produceProb = (float)recipe.ResultCounts[0] / (float)recipe.ItemCounts[0];
+            }
+          }
+        }
       }
 
       foreach (var tech in LDB.techs.dataArray)
