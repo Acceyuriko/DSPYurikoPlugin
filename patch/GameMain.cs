@@ -100,6 +100,15 @@ namespace DSPYurikoPlugin
             }
           }
         }
+
+        for (int j = 1; j < factory.factorySystem.ejectorCursor; j++) {
+          ref var node = ref factory.factorySystem.ejectorPool[j];
+          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isEjector) {
+            node.coldSpend = proto.prefabDesc.ejectorChargeFrame * 10000;
+            node.chargeSpend = proto.prefabDesc.ejectorColdFrame * 10000;
+          }
+        }
       }
 
       foreach (var tech in LDB.techs.dataArray)

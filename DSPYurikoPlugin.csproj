@@ -71,7 +71,6 @@
     <Compile Include="patch/StorageComponent.cs" />
     <Compile Include="patch/InserterComponent.cs" />
     <Compile Include="patch/LabComponent.cs" />
-    <Compile Include="patch/EjectorComponent.cs" />
     <Compile Include="patch/SiloComponent.cs" />
     <Compile Include="patch/StationComponent.cs" />
     <Compile Include="patch/PowerGeneratorComponent.cs" />
