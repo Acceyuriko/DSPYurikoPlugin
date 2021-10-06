@@ -21,7 +21,6 @@ namespace DSPYurikoPlugin
       Harmony.CreateAndPatchAll(typeof(LabComponentPatch));
       Harmony.CreateAndPatchAll(typeof(MechaPatch));
       Harmony.CreateAndPatchAll(typeof(ModelProtoPatch));
-      Harmony.CreateAndPatchAll(typeof(PlanetGenPatch));
       Harmony.CreateAndPatchAll(typeof(PowerGeneratorComponentPatch));
       Harmony.CreateAndPatchAll(typeof(SiloComponentPatch));
       Harmony.CreateAndPatchAll(typeof(StarGenPatch));

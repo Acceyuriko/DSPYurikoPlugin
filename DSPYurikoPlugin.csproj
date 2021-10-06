@@ -81,7 +81,6 @@
     <Compile Include="patch/DysonNode.cs" />
     <Compile Include="patch/FactorySystem.cs" />
     <Compile Include="patch/GameAbnormalityCheck.cs" />
-    <Compile Include="patch/PlanetGen.cs" />
     <Compile Include="patch/StarGen.cs" />
     <Compile Include="patch/UniverseGen.cs" />
     <Compile Include="patch/Mecha.cs" />
