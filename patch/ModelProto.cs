@@ -10,7 +10,9 @@ namespace DSPYurikoPlugin {
           __instance.prefabDesc.powerConnectDistance *= YurikoConstants.POWER_NODE_CONN_RATIO;
           __instance.prefabDesc.powerCoverRadius *= YurikoConstants.POWER_NODE_COVER_RATIO;
         } else if (__instance.prefabDesc.isAssembler) {
-          __instance.prefabDesc.assemblerSpeed *= YurikoConstants.ASSEMBLE_SPEED_RATIO;
+          __instance.prefabDesc.assemblerSpeed *= YurikoConstants.ASSEMBLER_SPEED_RATIO;
+        } else if (__instance.prefabDesc.isBelt) {
+          __instance.prefabDesc.beltSpeed = YurikoConstants.BELT_SPEED;
         }
       }
     }

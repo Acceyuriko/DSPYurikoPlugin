@@ -1,3 +1,4 @@
+using System.Reflection;
 using HarmonyLib;
 
 namespace DSPYurikoPlugin
@@ -37,17 +38,42 @@ namespace DSPYurikoPlugin
             node.coverRadius = proto.prefabDesc.powerCoverRadius;
           }
         }
+        if (factory.planet != null && factory.planet.factoryModel != null)
+        {
+          factory.planet.factoryModel.RefreshPowerNodes();
+        }
+
         for (int j = 1; j < factory.factorySystem.assemblerCursor; j++)
         {
           ref var node = ref factory.factorySystem.assemblerPool[j];
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isAssembler) {
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isAssembler)
+          {
             node.speed = proto.prefabDesc.assemblerSpeed;
           }
         }
-        if (factory.planet != null && factory.planet.factoryModel != null)
+
+        for (int j = 1; j < factory.cargoTraffic.beltCursor; j++)
         {
-          factory.planet.factoryModel.RefreshPowerNodes();
+          ref var node = ref factory.cargoTraffic.beltPool[j];
+          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isBelt)
+          {
+            node.speed = proto.prefabDesc.beltSpeed;
+            factory.cargoTraffic.AlterBeltRenderer(j, factory.entityPool, factory.planet.physics.colChunks);
+          }
+        }
+        for (int j = 1; j < factory.cargoTraffic.pathCursor; j++)
+        {
+          ref var path = ref factory.cargoTraffic.pathPool[j];
+          if (path != null)
+          {
+            var chunkCount = (int)(typeof(CargoPath).GetField("chunkCount", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(path));
+            for (int k = 0; k < chunkCount; k++)
+            {
+              path.chunks[k * 3 + 2] = YurikoConstants.BELT_SPEED;
+            }
+          }
         }
       }
 
