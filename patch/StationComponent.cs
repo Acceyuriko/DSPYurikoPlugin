@@ -31,7 +31,7 @@ namespace DSPYurikoPlugin
     [HarmonyPatch(typeof(StationComponent), "UpdateCollection")]
     public static bool StationUpdateCollectionPatch(ref float collectSpeedRate)
     {
-      collectSpeedRate *= 10;
+      collectSpeedRate *= YurikoConstants.STATION_COLLECT_SPEED_RATIO;
       return true;
     }
   }

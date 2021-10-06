@@ -49,8 +49,10 @@ namespace DSPYurikoPlugin
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
           if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isBelt)
           {
-            node.speed = proto.prefabDesc.beltSpeed;
-            factory.cargoTraffic.AlterBeltRenderer(j, factory.entityPool, factory.planet.physics.colChunks);
+            if (node.speed != proto.prefabDesc.beltSpeed) {
+              node.speed = proto.prefabDesc.beltSpeed;
+              factory.cargoTraffic.AlterBeltRenderer(j, factory.entityPool, factory.planet.physics.colChunks);
+            }
           }
         }
         for (int j = 1; j < factory.cargoTraffic.pathCursor; j++)
