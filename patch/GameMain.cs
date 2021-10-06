@@ -109,6 +109,15 @@ namespace DSPYurikoPlugin
             node.chargeSpend = proto.prefabDesc.ejectorColdFrame * 10000;
           }
         }
+
+        for (int j = 1; j < factory.factorySystem.siloCursor; j++) {
+          ref var node = ref factory.factorySystem.siloPool[j];
+          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isSilo) {
+            node.coldSpend = proto.prefabDesc.siloColdFrame * 10000;
+            node.chargeSpend = proto.prefabDesc.siloChargeFrame * 10000;
+          }
+        }
       }
 
       foreach (var tech in LDB.techs.dataArray)
