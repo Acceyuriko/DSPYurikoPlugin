@@ -24,21 +24,24 @@ namespace DSPYurikoPlugin
       GameMain.history.logisticShipWarpSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
       GameMain.history.logisticDroneSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
 
-      // for (int i = 0; i < GameMain.data.factoryCount; i++)
-      // {
-      //   ref var factory = ref GameMain.data.factories[i];
-      //   for (int j = 1; j < factory.powerSystem.nodeCursor; j++)
-      //   {
-      //     ref var node = ref factory.powerSystem.nodePool[j];
-      //     if (node.id == j)
-      //     {
-      //       node.connectDistance *= YurikoConstants.POWER_NODE_CONN_RATIO;
-      //       node.coverRadius *= YurikoConstants.POWER_NODE_COVER_RATIO;
-      //     }
-      //   }
-      // }
+      for (int i = 0; i < GameMain.data.factoryCount; i++)
+      {
+        ref var factory = ref GameMain.data.factories[i];
+        for (int j = 1; j < factory.powerSystem.nodeCursor; j++)
+        {
+          ref var node = ref factory.powerSystem.nodePool[j];
+          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerNode) {
+            node.connectDistance = proto.prefabDesc.powerConnectDistance;
+            node.coverRadius = proto.prefabDesc.powerCoverRadius;
+          }
+        }
+        if (factory.planet != null && factory.planet.factoryModel != null) {
+          factory.planet.factoryModel.RefreshPowerNodes();
+        }
+      }
 
-      foreach (var tech in LDB._techs.dataArray)
+      foreach (var tech in LDB.techs.dataArray)
       {
         var ts = GameMain.history.TechState(tech.ID);
         if (!ts.unlocked)

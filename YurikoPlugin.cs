@@ -8,27 +8,26 @@ namespace DSPYurikoPlugin
   {
     public void Start()
     {
-      Harmony.CreateAndPatchAll(typeof(YurikoPlugin));
-      Harmony.CreateAndPatchAll(typeof(GameMainPatch));
-      Harmony.CreateAndPatchAll(typeof(GameHistoryDataPatch));
-      Harmony.CreateAndPatchAll(typeof(StorageComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(CargoPathPatch));
-      Harmony.CreateAndPatchAll(typeof(InserterComponentPatch));
       Harmony.CreateAndPatchAll(typeof(AssemblerComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(FractionateComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(LabComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(EjectorComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(SiloComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(StationComponentPatch));
-      Harmony.CreateAndPatchAll(typeof(PowerGeneratorComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(CargoPathPatch));
       Harmony.CreateAndPatchAll(typeof(DysonNodePatch));
+      Harmony.CreateAndPatchAll(typeof(EjectorComponentPatch));
       Harmony.CreateAndPatchAll(typeof(FactorySystemPatch));
+      Harmony.CreateAndPatchAll(typeof(FractionateComponentPatch));
       Harmony.CreateAndPatchAll(typeof(GameAbnormalityCheckPatch));
-      Harmony.CreateAndPatchAll(typeof(PlanetGenPatch));
-      Harmony.CreateAndPatchAll(typeof(StarGenPatch));
-      Harmony.CreateAndPatchAll(typeof(UniverseGenPatch));
-      Harmony.CreateAndPatchAll(typeof(PowerSystem));
+      Harmony.CreateAndPatchAll(typeof(GameHistoryDataPatch));
+      Harmony.CreateAndPatchAll(typeof(GameMainPatch));
+      Harmony.CreateAndPatchAll(typeof(InserterComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(LabComponentPatch));
       Harmony.CreateAndPatchAll(typeof(MechaPatch));
+      Harmony.CreateAndPatchAll(typeof(ModelProtoPatch));
+      Harmony.CreateAndPatchAll(typeof(PlanetGenPatch));
+      Harmony.CreateAndPatchAll(typeof(PowerGeneratorComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(SiloComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(StarGenPatch));
+      Harmony.CreateAndPatchAll(typeof(StationComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(StorageComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(UniverseGenPatch));
     }
   }
 }

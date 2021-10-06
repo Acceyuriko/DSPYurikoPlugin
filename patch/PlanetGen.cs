@@ -231,7 +231,7 @@ namespace DSPYurikoPlugin
         planet.luminosity = Mathf.Log(planet.luminosity) + 1f;
       }
       planet.luminosity = Mathf.Round(planet.luminosity * 100f) / 100f;
-      planet.radius *= 2;
+      // planet.radius *= 2;
       PlanetGen.SetPlanetTheme(planet, themeIds, rand1, rand2, rand3, rand4, theme_seed);
       star.galaxy.astroPoses[planet.id].uRadius = planet.realRadius;
       __result = planet;

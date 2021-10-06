@@ -145,7 +145,6 @@ namespace DSPYurikoPlugin
       starData.uPosition = starData.position * 2400000.0;
       starData.name = NameGen.RandomStarName(seed1, starData, galaxy);
       starData.overrideName = "";
-      starData.radius *= 2;
       __result = starData;
       return false;
     }
