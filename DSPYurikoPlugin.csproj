@@ -76,6 +76,7 @@
     <Compile Include="patch/SiloComponent.cs" />
     <Compile Include="patch/StationComponent.cs" />
     <Compile Include="patch/PowerGeneratorComponent.cs" />
+    <Compile Include="patch/RecipeProto.cs" />
     <Compile Include="patch/DysonNode.cs" />
     <Compile Include="patch/FactorySystem.cs" />
     <Compile Include="patch/GameAbnormalityCheck.cs" />

@@ -43,16 +43,6 @@ namespace DSPYurikoPlugin
           factory.planet.factoryModel.RefreshPowerNodes();
         }
 
-        for (int j = 1; j < factory.factorySystem.assemblerCursor; j++)
-        {
-          ref var node = ref factory.factorySystem.assemblerPool[j];
-          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isAssembler)
-          {
-            node.speed = proto.prefabDesc.assemblerSpeed;
-          }
-        }
-
         for (int j = 1; j < factory.cargoTraffic.beltCursor; j++)
         {
           ref var node = ref factory.cargoTraffic.beltPool[j];
@@ -72,6 +62,31 @@ namespace DSPYurikoPlugin
             for (int k = 0; k < chunkCount; k++)
             {
               path.chunks[k * 3 + 2] = YurikoConstants.BELT_SPEED;
+            }
+          }
+        }
+
+        for (int j = 1; j < factory.factorySystem.assemblerCursor; j++)
+        {
+          ref var node = ref factory.factorySystem.assemblerPool[j];
+          var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isAssembler && node.recipeId > 0)
+          {
+            var recipeProto = LDB.recipes.Select(node.recipeId);
+            if (recipeProto != null)
+            {
+              node.timeSpend = recipeProto.TimeSpend * 10000;
+            }
+          }
+        }
+        for (int j = 1; j < factory.factorySystem.labCursor; j++)
+        {
+          ref var node = ref factory.factorySystem.labPool[j];
+          if (node.matrixMode) {
+            var recipeProto = LDB.recipes.Select(node.recipeId);
+            if (recipeProto != null)
+            {
+              node.timeSpend = recipeProto.TimeSpend * 10000;
             }
           }
         }

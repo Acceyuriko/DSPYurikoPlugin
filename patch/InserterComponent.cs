@@ -46,11 +46,7 @@ namespace DSPYurikoPlugin
       {
         return false;
       }
-      int stt = __instance.stt / 10;
-      if (stt < 1)
-      {
-        stt = 1;
-      }
+      int stt = 1;
       switch (__instance.stage)
       {
         case EInserterStage.Picking:
