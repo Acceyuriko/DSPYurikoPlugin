@@ -32,7 +32,7 @@ namespace DSPYurikoPlugin
         {
           ref var node = ref factory.powerSystem.nodePool[j];
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerNode)
+          if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerNode && proto.ID == YurikoConstants.MODEL_PROTO_ID_电力感应塔)
           {
             node.connectDistance = proto.prefabDesc.powerConnectDistance;
             node.coverRadius = proto.prefabDesc.powerCoverRadius;

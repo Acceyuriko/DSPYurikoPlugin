@@ -12,5 +12,6 @@ namespace DSPYurikoPlugin {
     public static int SILO_RATIO = 10;
     public static int STATION_COLLECT_SPEED_RATIO = 10;
     public static int RAY_RECEIVER_RATIO = 10;
+    public static int MODEL_PROTO_ID_电力感应塔 = 44;
   }
 }

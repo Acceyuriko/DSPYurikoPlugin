@@ -10,7 +10,7 @@ namespace DSPYurikoPlugin
     {
       if (__instance.prefabDesc != null)
       {
-        if (__instance.prefabDesc.isPowerNode)
+        if (__instance.ID == YurikoConstants.MODEL_PROTO_ID_电力感应塔) // 电力感应塔
         {
           __instance.prefabDesc.powerConnectDistance *= YurikoConstants.POWER_NODE_CONN_RATIO;
           __instance.prefabDesc.powerCoverRadius *= YurikoConstants.POWER_NODE_COVER_RATIO;
