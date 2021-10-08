@@ -18,7 +18,6 @@ namespace DSPYurikoPlugin
       GameMain.mainPlayer.mecha.droneSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
       GameMain.mainPlayer.mecha.miningSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
       GameMain.mainPlayer.mecha.maxSailSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
-      GameMain.mainPlayer.mecha.maxWarpSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
       GameMain.mainPlayer.mecha.replicateSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
 
       GameMain.history.logisticShipSailSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;

@@ -36,7 +36,7 @@ namespace DSPYurikoPlugin
       w.Write(__instance.walkSpeed / YurikoConstants.WALK_SPEED_RATIO);
       w.Write(__instance.jumpSpeed);
       w.Write(__instance.maxSailSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
-      w.Write(__instance.maxWarpSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
+      w.Write(__instance.maxWarpSpeed);
       w.Write(__instance.buildArea);
       __instance.forge.Export(w);
       __instance.lab.Export(w);

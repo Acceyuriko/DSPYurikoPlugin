@@ -102,7 +102,7 @@ namespace DSPYurikoPlugin
           __instance.dysonNodeLatitude += (float)value;
           break;
         case 27:
-          mainPlayer.mecha.maxWarpSpeed += (float)(value * 40000.0) * YurikoConstants.DEFAULT_SPEED_RATIO;
+          mainPlayer.mecha.maxWarpSpeed += (float)(value * 40000.0);
           break;
         case 28:
           __instance.blueprintLimit = num;
