@@ -50,7 +50,7 @@ namespace DSPYurikoPlugin
           mainPlayer.mecha.droneMovement += num;
           break;
         case 10:
-          mainPlayer.mecha.droneSpeed += (float)value * YurikoConstants.DEFAULT_SPEED_RATIO;
+          mainPlayer.mecha.droneSpeed += (float)value;
           break;
         case 11:
           mainPlayer.mecha.maxSailSpeed += (float)value * YurikoConstants.DEFAULT_SPEED_RATIO;

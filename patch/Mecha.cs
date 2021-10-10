@@ -41,7 +41,7 @@ namespace DSPYurikoPlugin
       __instance.forge.Export(w);
       __instance.lab.Export(w);
       w.Write(__instance.droneCount);
-      w.Write(__instance.droneSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
+      w.Write(__instance.droneSpeed);
       w.Write(__instance.droneMovement);
       for (int index = 0; index < __instance.droneCount; ++index)
         __instance.drones[index].Export(w);
