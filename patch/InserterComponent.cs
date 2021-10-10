@@ -38,11 +38,10 @@ namespace DSPYurikoPlugin
         AnimData[] animPool,
         float power)
     {
-      tick++;
       if (animPool != null)
       {
         animPool[__instance.entityId].power = power;
-        animPool[__instance.entityId].time = (float)(tick % 60) / 60f;
+        animPool[__instance.entityId].time = Math.Abs((float)(__instance.time % 60) / 60f);
       }
       if (power < 0.100000001490116)
       {
@@ -65,6 +64,7 @@ namespace DSPYurikoPlugin
             int num = factory.PickFrom(__instance.pickTarget, __instance.pickOffset, __instance.filter, needs);
             if (num > 0)
             {
+              __instance.time++;
               __instance.itemId = num;
             }
           }
@@ -75,6 +75,7 @@ namespace DSPYurikoPlugin
           if (num > 0)
           {
             __instance.itemId = num;
+            __instance.time++;
           }
         }
       }
@@ -83,6 +84,7 @@ namespace DSPYurikoPlugin
         if (factory.InsertInto(__instance.insertTarget, __instance.insertOffset, __instance.itemId))
         {
           __instance.itemId = 0;
+          __instance.time++;
         }
       }
       if (animPool != null)
@@ -91,7 +93,5 @@ namespace DSPYurikoPlugin
       }
       return false;
     }
-
-    private static long tick = 0;
   }
 }
