@@ -33,6 +33,9 @@ namespace DSPYurikoPlugin
         {
           __instance.prefabDesc.powerProductHeat /= YurikoConstants.RAY_RECEIVER_RATIO;
         }
+        else if (__instance.prefabDesc.isAssembler) {
+          __instance.prefabDesc.assemblerSpeed = YurikoConstants.ASSEMBLER_SPEED;
+        }
       }
     }
   }

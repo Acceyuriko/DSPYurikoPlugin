@@ -86,6 +86,7 @@ namespace DSPYurikoPlugin
           var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
           if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isAssembler && node.recipeId > 0)
           {
+            node.speed = YurikoConstants.ASSEMBLER_SPEED;
             var recipeProto = LDB.recipes.Select(node.recipeId);
             if (recipeProto != null)
             {
