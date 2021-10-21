@@ -159,7 +159,7 @@ namespace DSPYurikoPlugin
       w.Write(__instance.logisticDroneSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
       w.Write(__instance.logisticDroneSpeedScale);
       w.Write(__instance.logisticDroneCarries);
-      w.Write(__instance.logisticShipSailSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
+      w.Write(__instance.logisticShipSailSpeed);
       w.Write(__instance.logisticShipWarpSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
       w.Write(__instance.logisticShipSpeedScale);
       w.Write(__instance.logisticShipWarpDrive);
