@@ -67,6 +67,7 @@
     <Compile Include="YurikoPlugin.cs" />
     <Compile Include="util/YurikoConstants.cs" />
     <Compile Include="util/YurikoLogging.cs" />
+    <Compile Include="patch/BuildTool_Reform.cs" />
     <Compile Include="patch/GameMain.cs" />
     <Compile Include="patch/GameHistoryData.cs" />
     <Compile Include="patch/StorageComponent.cs" />
