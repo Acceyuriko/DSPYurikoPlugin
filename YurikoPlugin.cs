@@ -14,6 +14,7 @@ namespace DSPYurikoPlugin
       Harmony.CreateAndPatchAll(typeof(GameHistoryDataPatch));
       Harmony.CreateAndPatchAll(typeof(GameMainPatch));
       Harmony.CreateAndPatchAll(typeof(InserterComponentPatch));
+      Harmony.CreateAndPatchAll(typeof(ItemProtoPatch));
       Harmony.CreateAndPatchAll(typeof(LabComponentPatch));
       Harmony.CreateAndPatchAll(typeof(MechaPatch));
       Harmony.CreateAndPatchAll(typeof(ModelProtoPatch));

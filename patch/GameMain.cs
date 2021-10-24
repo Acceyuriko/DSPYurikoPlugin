@@ -20,6 +20,7 @@ namespace DSPYurikoPlugin
       GameMain.mainPlayer.mecha.replicateSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
 
       GameMain.history.logisticShipWarpSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
+      GameMain.history.logisticShipCarries *= YurikoConstants.LOGISTIC_SHIP_CARRIES_RATIO;
       GameMain.history.logisticDroneSpeed *= YurikoConstants.DEFAULT_SPEED_RATIO;
 
       for (int i = 0; i < GameMain.data.factoryCount; i++)

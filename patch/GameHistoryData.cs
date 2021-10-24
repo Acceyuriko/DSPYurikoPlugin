@@ -74,7 +74,7 @@ namespace DSPYurikoPlugin
           __instance.logisticShipWarpDrive = true;
           break;
         case 18:
-          __instance.logisticDroneCarries += num;
+          __instance.logisticDroneCarries += num * YurikoConstants.LOGISTIC_SHIP_CARRIES_RATIO;
           break;
         case 19:
           __instance.logisticShipCarries += num;
@@ -163,7 +163,7 @@ namespace DSPYurikoPlugin
       w.Write(__instance.logisticShipWarpSpeed / YurikoConstants.DEFAULT_SPEED_RATIO);
       w.Write(__instance.logisticShipSpeedScale);
       w.Write(__instance.logisticShipWarpDrive);
-      w.Write(__instance.logisticShipCarries);
+      w.Write(__instance.logisticShipCarries / YurikoConstants.LOGISTIC_SHIP_CARRIES_RATIO);
       w.Write(__instance.miningCostRate);
       w.Write(__instance.miningSpeedScale);
       w.Write(__instance.storageLevel);

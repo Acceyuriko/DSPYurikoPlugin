@@ -71,6 +71,7 @@
     <Compile Include="patch/GameHistoryData.cs" />
     <Compile Include="patch/StorageComponent.cs" />
     <Compile Include="patch/InserterComponent.cs" />
+    <Compile Include="patch/ItemProto.cs" />
     <Compile Include="patch/LabComponent.cs" />
     <Compile Include="patch/StationComponent.cs" />
     <Compile Include="patch/RecipeProto.cs" />

@@ -13,6 +13,9 @@ namespace DSPYurikoPlugin {
     public static int EJECTOR_RATIO = 10;
     public static int SILO_RATIO = 10;
     public static int STATION_COLLECT_SPEED_RATIO = 10;
+    public static int STATION_MAX_ITEM_COUNT_RATIO = 10;
+    
+    public static int LOGISTIC_SHIP_CARRIES_RATIO = 5;
     public static int RAY_RECEIVER_RATIO = 10;
     public static int PHOTO_VOLTAIC_RATIO = 10;
     public static int WIND_RATIO = 10;
