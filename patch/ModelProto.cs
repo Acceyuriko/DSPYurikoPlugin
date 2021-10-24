@@ -34,6 +34,8 @@ namespace DSPYurikoPlugin
           __instance.prefabDesc.powerProductHeat /= YurikoConstants.RAY_RECEIVER_RATIO;
           if (__instance.prefabDesc.photovoltaic) {
             __instance.prefabDesc.genEnergyPerTick *= YurikoConstants.PHOTO_VOLTAIC_RATIO;
+          } else if (__instance.prefabDesc.windForcedPower) {
+            __instance.prefabDesc.genEnergyPerTick *= YurikoConstants.WIND_RATIO;
           }
         }
         else if (__instance.prefabDesc.isAssembler) {
