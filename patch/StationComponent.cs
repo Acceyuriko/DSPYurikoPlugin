@@ -46,12 +46,11 @@ namespace DSPYurikoPlugin
       int shipCarries
     )
     {
-      __instance.ClearRemotePairs();
       ref var astroPoses = ref GameMain.data.galaxy.astroPoses;
-      SortedList<double, SupplyDemandPair> sortedRemotePairs = new SortedList<double, SupplyDemandPair>();
+      SortedList<double, SupplyDemandPair> sortedRemotePairs = new SortedList<double, SupplyDemandPair>(new DuplicateKeyComparer());
       for (int index = 0; index < __instance.storage.Length; ++index)
       {
-        var store = __instance.storage[index];
+        ref var store = ref __instance.storage[index];
         for (int remoteStationId = 1; remoteStationId < gStationCursor; ++remoteStationId)
         {
           if (
@@ -62,11 +61,10 @@ namespace DSPYurikoPlugin
           {
             continue;
           }
+          var trip = (astroPoses[__instance.planetId].uPos - astroPoses[gStationPool[remoteStationId].planetId].uPos).sqrMagnitude;
           for (int remoteStoreIndex = 0; remoteStoreIndex < gStationPool[remoteStationId].storage.Length; ++remoteStoreIndex)
           {
             var remoteStore = gStationPool[remoteStationId].storage[remoteStoreIndex];
-            var trip = (astroPoses[__instance.planetId].uPos - astroPoses[gStationPool[remoteStationId].planetId].uPos).magnitude +
-              astroPoses[__instance.planetId].uRadius + astroPoses[gStationPool[remoteStationId].planetId].uRadius;
             if (remoteStore.itemId == store.itemId)
             {
               if (remoteStore.remoteLogic == ELogisticStorage.Supply && store.remoteLogic == ELogisticStorage.Demand)
@@ -82,9 +80,13 @@ namespace DSPYurikoPlugin
         }
       }
 
-      foreach(var pair in sortedRemotePairs.Values) {
-        __instance.AddRemotePair(pair.supplyId, pair.supplyIndex, pair.demandId, pair.demandIndex);
+
+      if (__instance.remotePairs == null || sortedRemotePairs.Count > __instance.remotePairs.Length)
+      {
+        __instance.SetRemotePairCapacity(sortedRemotePairs.Count);
       }
+      __instance.remotePairCount = sortedRemotePairs.Count;
+      sortedRemotePairs.Values.CopyTo(__instance.remotePairs, 0);
 
       if (keyStationGId <= 0)
         return false;
@@ -230,6 +232,26 @@ namespace DSPYurikoPlugin
         }
       }
       return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(StationComponent), "InternalTickRemote")]
+    public static bool InternalTickRemote(ref StationComponent __instance)
+    {
+      return true;
+    }
+
+    private class DuplicateKeyComparer : IComparer<double>
+    {
+      public int Compare(double x, double y)
+      {
+        var result = (int)x - (int)y;
+        if (result == 0)
+        {
+          return 1;
+        }
+        return result;
+      }
     }
   }
 }

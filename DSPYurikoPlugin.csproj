@@ -89,11 +89,11 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-      <!-- taskkill /f /im DSPGAME.exe
+      taskkill /f /im DSPGAME.exe
       mkdir "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)"
       del /q "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)"
       copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)"
-      start steam://rungameid/1366540 -->
+      start steam://rungameid/1366540
     </PostBuildEvent>
   </PropertyGroup>
 </Project>
