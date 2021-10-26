@@ -46,47 +46,49 @@ namespace DSPYurikoPlugin
       int shipCarries
     )
     {
-      ref var astroPoses = ref GameMain.data.galaxy.astroPoses;
-      SortedList<double, SupplyDemandPair> sortedRemotePairs = new SortedList<double, SupplyDemandPair>(new DuplicateKeyComparer());
       for (int index = 0; index < __instance.storage.Length; ++index)
       {
-        ref var store = ref __instance.storage[index];
-        for (int remoteStationId = 1; remoteStationId < gStationCursor; ++remoteStationId)
+        if (__instance.storage[index].remoteLogic == ELogisticStorage.Supply)
         {
-          if (
-            gStationPool[remoteStationId] == null ||
-            gStationPool[remoteStationId].gid != remoteStationId ||
-            gStationPool[remoteStationId].planetId == __instance.planetId
-          )
+          int itemId = __instance.storage[index].itemId;
+          for (int dId = __instance.gid + 1; dId < gStationCursor; ++dId)
           {
-            continue;
-          }
-          var trip = (astroPoses[__instance.planetId].uPos - astroPoses[gStationPool[remoteStationId].planetId].uPos).sqrMagnitude;
-          for (int remoteStoreIndex = 0; remoteStoreIndex < gStationPool[remoteStationId].storage.Length; ++remoteStoreIndex)
-          {
-            var remoteStore = gStationPool[remoteStationId].storage[remoteStoreIndex];
-            if (remoteStore.itemId == store.itemId)
+            if (gStationPool[dId] != null && gStationPool[dId].gid == dId && gStationPool[dId].planetId != __instance.planetId)
             {
-              if (remoteStore.remoteLogic == ELogisticStorage.Supply && store.remoteLogic == ELogisticStorage.Demand)
+              StationStore[] storage = gStationPool[dId].storage;
+              for (int dIdx = 0; dIdx < storage.Length; ++dIdx)
               {
-                sortedRemotePairs.Add(trip, new SupplyDemandPair(remoteStationId, remoteStoreIndex, __instance.gid, index));
+                if (itemId == storage[dIdx].itemId && storage[dIdx].remoteLogic == ELogisticStorage.Demand)
+                {
+                  __instance.AddRemotePair(__instance.gid, index, dId, dIdx);
+                  gStationPool[dId].AddRemotePair(__instance.gid, index, dId, dIdx);
+                }
               }
-              else if (remoteStore.remoteLogic == ELogisticStorage.Demand && store.remoteLogic == ELogisticStorage.Supply)
+            }
+          }
+        }
+        else if (__instance.storage[index].remoteLogic == ELogisticStorage.Demand)
+        {
+          int itemId = __instance.storage[index].itemId;
+          for (int sId = __instance.gid + 1; sId < gStationCursor; ++sId)
+          {
+            if (gStationPool[sId] != null && gStationPool[sId].gid == sId && gStationPool[sId].planetId != __instance.planetId)
+            {
+              StationStore[] storage = gStationPool[sId].storage;
+              for (int sIdx = 0; sIdx < storage.Length; ++sIdx)
               {
-                sortedRemotePairs.Add(trip, new SupplyDemandPair(__instance.gid, index, remoteStationId, remoteStoreIndex));
+                if (itemId == storage[sIdx].itemId && storage[sIdx].remoteLogic == ELogisticStorage.Supply)
+                {
+                  __instance.AddRemotePair(sId, sIdx, __instance.gid, index);
+                  gStationPool[sId].AddRemotePair(sId, sIdx, __instance.gid, index);
+                }
               }
             }
           }
         }
       }
 
-
-      if (__instance.remotePairs == null || sortedRemotePairs.Count > __instance.remotePairs.Length)
-      {
-        __instance.SetRemotePairCapacity(sortedRemotePairs.Count);
-      }
-      __instance.remotePairCount = sortedRemotePairs.Count;
-      sortedRemotePairs.Values.CopyTo(__instance.remotePairs, 0);
+      Array.Sort(__instance.remotePairs, new DistanceComparer());
 
       if (keyStationGId <= 0)
         return false;
@@ -238,19 +240,27 @@ namespace DSPYurikoPlugin
     [HarmonyPatch(typeof(StationComponent), "InternalTickRemote")]
     public static bool InternalTickRemote(ref StationComponent __instance)
     {
+      __instance.remotePairProcess = 0;
       return true;
     }
 
-    private class DuplicateKeyComparer : IComparer<double>
+    private class DistanceComparer : IComparer<SupplyDemandPair>
     {
-      public int Compare(double x, double y)
+      public int Compare(SupplyDemandPair x, SupplyDemandPair y)
       {
-        var result = (int)x - (int)y;
-        if (result == 0)
-        {
-          return 1;
+        ref var stationPool = ref GameMain.data.galacticTransport.stationPool;
+        var xSupplyPlanetId = stationPool[x.supplyId].planetId;
+        var xDemandPlanetId = stationPool[x.demandId].planetId;
+        var ySupplyPlanetId = stationPool[y.supplyId].planetId;
+        var yDemandPlanetId = stationPool[y.demandId].planetId;
+        if (xSupplyPlanetId == ySupplyPlanetId && xDemandPlanetId == yDemandPlanetId || xSupplyPlanetId == yDemandPlanetId && xDemandPlanetId == ySupplyPlanetId) {
+          return 0;
         }
-        return result;
+        ref var astroPoses = ref GameMain.galaxy.astroPoses;
+        return (int)(
+          (astroPoses[xSupplyPlanetId].uPos - astroPoses[xDemandPlanetId].uPos).sqrMagnitude -
+          (astroPoses[ySupplyPlanetId].uPos - astroPoses[yDemandPlanetId].uPos).sqrMagnitude
+        );
       }
     }
   }
