@@ -88,7 +88,9 @@ namespace DSPYurikoPlugin
         }
       }
 
-      Array.Sort(__instance.remotePairs, new DistanceComparer());
+      if (__instance.remotePairs != null) {
+        Array.Sort(__instance.remotePairs, new DistanceComparer());
+      }
 
       if (keyStationGId <= 0)
         return false;
@@ -249,6 +251,12 @@ namespace DSPYurikoPlugin
       public int Compare(SupplyDemandPair x, SupplyDemandPair y)
       {
         ref var stationPool = ref GameMain.data.galacticTransport.stationPool;
+        if (stationPool[x.supplyId] == null || stationPool[x.demandId] == null) {
+          return 1;
+        }
+        if (stationPool[y.supplyId] == null || stationPool[y.demandId] == null) {
+          return -1;
+        }
         var xSupplyPlanetId = stationPool[x.supplyId].planetId;
         var xDemandPlanetId = stationPool[x.demandId].planetId;
         var ySupplyPlanetId = stationPool[y.supplyId].planetId;
@@ -257,10 +265,15 @@ namespace DSPYurikoPlugin
           return 0;
         }
         ref var astroPoses = ref GameMain.galaxy.astroPoses;
-        return (int)(
-          (astroPoses[xSupplyPlanetId].uPos - astroPoses[xDemandPlanetId].uPos).sqrMagnitude -
-          (astroPoses[ySupplyPlanetId].uPos - astroPoses[yDemandPlanetId].uPos).sqrMagnitude
-        );
+        var result = (astroPoses[xSupplyPlanetId].uPos - astroPoses[xDemandPlanetId].uPos).sqrMagnitude -
+          (astroPoses[ySupplyPlanetId].uPos - astroPoses[yDemandPlanetId].uPos).sqrMagnitude;
+        if (result < 0) {
+          return -1;
+        }
+        if (result > 0) {
+          return 1;
+        }
+        return 0;
       }
     }
   }
