@@ -51,9 +51,11 @@ namespace DSPYurikoPlugin
               node.productHeat = proto.prefabDesc.powerProductHeat;
             }
           }
-          if (node.photovoltaic) {
+          if (node.photovoltaic || node.wind)
+          {
             var proto = LDB.models.Select(factory.entityPool[node.entityId].modelIndex);
-            if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerGen) {
+            if (proto != null && proto.prefabDesc != null && proto.prefabDesc.isPowerGen)
+            {
               node.genEnergyPerTick = proto.prefabDesc.genEnergyPerTick;
             }
           }

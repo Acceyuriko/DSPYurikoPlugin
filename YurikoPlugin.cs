@@ -3,11 +3,12 @@ using HarmonyLib;
 
 namespace DSPYurikoPlugin
 {
-  [BepInPlugin("cc.acceyuriko.dsp", "YurikoPlugin", "1.0")]
+  [BepInPlugin("cc.acceyuriko.dsp", "YurikoPlugin", "1.0.1")]
   public class YurikoPlugin : BaseUnityPlugin
   {
     public void Start()
     {
+      // Harmony.CreateAndPatchAll(typeof(AchievementSystemPatch));
       Harmony.CreateAndPatchAll(typeof(BuildTool_ReformPatch));
       Harmony.CreateAndPatchAll(typeof(DysonNodePatch));
       Harmony.CreateAndPatchAll(typeof(FactorySystemPatch));

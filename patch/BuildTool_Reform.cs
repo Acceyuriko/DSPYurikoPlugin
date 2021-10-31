@@ -8,7 +8,8 @@ namespace DSPYurikoPlugin
   {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(BuildTool_Reform), "_OnInit")]
-    public static void _OnInit(ref BuildTool_Reform __instance) {
+    public static void _OnInit(ref BuildTool_Reform __instance)
+    {
       __instance.cursorIndices = new int[maxBrushSize * maxBrushSize];
       __instance.cursorPoints = new Vector3[maxBrushSize * maxBrushSize];
     }
@@ -118,10 +119,15 @@ namespace DSPYurikoPlugin
                   int id1 = __instance.handItem.ID;
                   consumeRegister[id1] += __instance.cursorPointCount;
                   int id2 = __instance.handItem.ID;
-                  GameMain.gameScenario.NotifyOnBuild(__instance.planet.id, id2, 0);
+                  if (GameMain.gameScenario != null)
+                  {
+                    GameMain.gameScenario.NotifyOnBuild(__instance.planet.id, id2, 0);
+                    if (__instance.cursorPointCount > 0)
+                    {
+                      GameMain.gameScenario.milestoneLogic.useFoundationDeterminator.ManualUnlock();
+                    }
+                  }
                   GameMain.achievementLogic.NotifyOnBuild(__instance.planet.id, id2, 0);
-                  if (__instance.cursorPointCount > 0)
-                    __instance.gameData.milestoneSystem.milestoneLogic.useFoundationDeterminator.ManualUnlock();
                   GameMain.history.MarkItemBuilt(id2, __instance.cursorPointCount);
                 }
                 else if (onDown)
