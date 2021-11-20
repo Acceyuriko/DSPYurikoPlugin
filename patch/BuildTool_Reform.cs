@@ -118,17 +118,11 @@ namespace DSPYurikoPlugin
                   }
                   int id1 = __instance.handItem.ID;
                   consumeRegister[id1] += __instance.cursorPointCount;
-                  int id2 = __instance.handItem.ID;
-                  if (GameMain.gameScenario != null)
+                  if (GameMain.gameScenario != null && __instance.cursorPointCount > 0) 
                   {
-                    GameMain.gameScenario.NotifyOnBuild(__instance.planet.id, id2, 0);
-                    if (__instance.cursorPointCount > 0)
-                    {
-                      GameMain.gameScenario.milestoneLogic.useFoundationDeterminator.ManualUnlock();
-                    }
+                    GameMain.gameScenario.NotifyOnBuild(__instance.planet.id, id1, 0);
                   }
-                  GameMain.achievementLogic.NotifyOnBuild(__instance.planet.id, id2, 0);
-                  GameMain.history.MarkItemBuilt(id2, __instance.cursorPointCount);
+                  GameMain.history.MarkItemBuilt(id1, __instance.cursorPointCount);
                 }
                 else if (onDown)
                   UIRealtimeTip.Popup("沙土不足".Translate());
@@ -147,13 +141,9 @@ namespace DSPYurikoPlugin
       }
       if (!flag1)
         __instance.drawing = flag1;
-      if (drawing == __instance.drawing)
+      if (drawing == __instance.drawing || GameMain.gameScenario == null)
         return false;
-      if (GameMain.gameScenario != null)
-        GameMain.gameScenario.NotifyOnDoReformOpt(drawing ? 2 : 1);
-      if (GameMain.achievementLogic == null)
-        return false;
-      GameMain.achievementLogic.NotifyOnDoReformOpt(drawing ? 2 : 1);
+      GameMain.gameScenario.NotifyOnDoReformOpt(drawing ? 2 : 1);
       return false;
     }
 
