@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSP supermarket of building</title>
+    <style>
+      .node {
+        fill: #fff;
+        stroke: #333;
+        stroke-width: 1px;
+      }
+      .edgePath {
+        stroke-width: 1px;
+        fill: none;
+      }
+    </style>
+  </head>
+  <body>
+    <svg><g></g></svg>
+    <script src="https://unpkg.com/d3@7.2.1/dist/d3.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
+    <script>
+      const g = new dagreD3.graphlib.Graph({ directed: true });
+
+      g.setGraph({
+        ranksep: 200,
+      });
+
+      g.setDefaultEdgeLabel(function () {
+        return {};
+      });
+
+      const node = (id) => {
+        g.setNode(id, { label: id });
+      };
+
+      const edge = (src, target) => {
+        g.setEdge(src, target, {
+          curve: d3.curveBasis,
+          style: `stroke: rgb(${new Array(3)
+            .fill(null)
+            .map(() => Math.floor(Math.random() * 256))
+            .join(',')})`,
+        });
+      };
+
+      node('铁矿');
+      node('铜矿');
+      node('石矿');
+      node('硅矿');
+      node('煤矿');
+      node('石墨烯');
+      node('光子合并器');
+      node('钛矿');
+      node('钛合金');
+      node('钛玻璃');
+      node('卡晶');
+      node('粒子容器');
+      node('分形硅');
+      node('重氢');
+      node('金伯利');
+      node('碳纳米管');
+      node('铁');
+      node('磁铁');
+      node('齿轮');
+      node('钢材');
+      node('铜');
+      node('金刚石');
+      node('石材');
+      node('玻璃');
+      node('棱镜');
+      node('电浆激发器');
+      node('线圈');
+      node('马达');
+      node('绿马达');
+      node('蓝马达');
+      node('石墨');
+      node('钛');
+      node('硅');
+      node('晶格硅');
+      node('电线杆');
+      node('电路板');
+      node('太阳能');
+      node('传送带');
+      node('分拣器');
+      node('微晶元件');
+      node('处理器');
+      node('框架材料');
+      node('湮灭约束球');
+      node('位面过滤器');
+      node('奇异物质');
+      node('引力透镜');
+      node('量子芯片');
+      node('蓄电池空');
+      node('蓄电池满');
+      node('分流器');
+      node('箱子');
+      node('熔炉');
+      node('工作台');
+      node('轨道弹射器');
+      node('小物流塔');
+      node('大物流塔');
+      node('加力推进器');
+      node('大飞机');
+      node('轨道采集器');
+      node('原油精炼厂');
+      node('化工厂');
+      node('研究站');
+      node('射线接收站');
+      node('小太阳');
+      node('发射井');
+      node('对撞机');
+
+      edge('铁矿', '铁')
+
+      edge('铁矿', '磁铁')
+
+      edge('铜矿', '铜')
+
+      edge('硅矿', '硅')
+
+      edge('分形硅', '晶格硅')
+
+      edge('石矿', '石材')
+
+      edge('石矿', '玻璃')
+
+      edge('玻璃', '棱镜')
+
+      edge('棱镜', '电浆激发器')
+
+      edge('钛矿', '钛')
+
+      edge('煤矿', '石墨')
+
+      edge('铁', '齿轮')
+
+      edge('铁', '钢材')
+
+      edge('金伯利', '金刚石')
+
+      edge('铁', '传送带')
+      edge('齿轮', '传送带')
+
+      edge('铁', '分拣器')
+      edge('电路板', '分拣器')
+
+      edge('铁', '马达')
+      edge('齿轮', '马达')
+      edge('线圈', '马达')
+
+      edge('线圈', '绿马达')
+      edge('马达', '绿马达')
+
+      edge('绿马达', '蓝马达')
+      edge('石墨', '蓝马达')
+      edge('磁铁', '蓝马达')
+
+      edge('磁铁', '线圈')
+      edge('铜', '线圈')
+
+      edge('铜', '微晶元件')
+      edge('硅', '微晶元件')
+
+      edge('微晶元件', '处理器')
+      edge('电路板', '处理器')
+
+      edge('钛合金', '框架材料')
+      edge('碳纳米管', '框架材料')
+      edge('硅', '框架材料')
+
+      edge('粒子容器', '湮灭约束球')
+      edge('处理器', '湮灭约束球')
+
+      edge('卡晶', '位面过滤器')
+      edge('钛玻璃', '位面过滤器')
+
+      edge('处理器', '量子芯片')
+      edge('位面过滤器', '量子芯片')
+
+      edge('粒子容器', '奇异物质')
+      edge('铁', '奇异物质')
+      edge('重氢', '奇异物质')
+
+      edge('奇异物质', '引力透镜')
+      edge('金刚石', '引力透镜')
+
+      edge('线圈', '电线杆')
+      edge('铁', '电线杆')
+
+      edge('铁', '电路板')
+      edge('铜', '电路板')
+
+      edge('铜', '太阳能')
+      edge('硅', '太阳能')
+      edge('电路板', '太阳能')
+
+      edge('铁', '蓄电池空')
+      edge('蓝马达', '蓄电池空')
+      edge('晶格硅', '蓄电池空')
+
+      edge('蓄电池空', '蓄电池满')
+
+      edge('铁', '分流器')
+      edge('齿轮', '分流器')
+      edge('电路板', '分流器')
+
+      edge('铁', '箱子')
+      edge('石材', '箱子')
+
+      edge('石材', '熔炉')
+      edge('铁', '熔炉')
+      edge('电路板', '熔炉')
+      edge('线圈', '熔炉')
+
+      edge('电路板', '工作台')
+      edge('铁', '工作台')
+      edge('齿轮', '工作台')
+
+      edge('钢材', '化工厂')
+      edge('石材', '化工厂')
+      edge('玻璃', '化工厂')
+      edge('电路板', '化工厂')
+
+      edge('铁', '研究站')
+      edge('玻璃', '研究站')
+      edge('电路板', '研究站')
+      edge('线圈', '研究站')
+
+      edge('钢材', '原油精炼厂')
+      edge('石材', '原油精炼厂')
+      edge('电路板', '原油精炼厂')
+      edge('电浆激发器', '原油精炼厂')
+
+      edge('齿轮', '轨道弹射器')
+      edge('钢材', '轨道弹射器')
+      edge('处理器', '轨道弹射器')
+      edge('蓝马达', '轨道弹射器')
+
+      edge('钢材', '射线接收站')
+      edge('硅', '射线接收站')
+      edge('光子合并器', '射线接收站')
+      edge('处理器', '射线接收站')
+      edge('蓝马达', '射线接收站')
+
+      edge('钢材', '小物流塔')
+      edge('钛', '小物流塔')
+      edge('处理器', '小物流塔')
+      edge('粒子容器', '小物流塔')
+
+      edge('小物流塔', '大物流塔')
+      edge('钛合金', '大物流塔')
+      edge('粒子容器', '大物流塔')
+
+      edge('钛合金', '加力推进器')
+      edge('绿马达', '加力推进器')
+
+      edge('钛合金', '大飞机')
+      edge('处理器', '大飞机')
+      edge('加力推进器', '大飞机')
+
+      edge('大物流塔', '轨道采集器')
+      edge('蓝马达', '轨道采集器')
+      edge('加力推进器', '轨道采集器')
+      edge('蓄电池满', '轨道采集器')
+
+      edge('钛合金', '小太阳')
+      edge('框架材料', '小太阳')
+      edge('湮灭约束球', '小太阳')
+      edge('量子芯片', '小太阳')
+
+      edge('钛合金', '发射井')
+      edge('框架材料', '发射井')
+      edge('引力透镜', '发射井')
+      edge('量子芯片', '发射井')
+
+      edge('钛合金', '对撞机')
+      edge('框架材料', '对撞机')
+      edge('蓝马达', '对撞机')
+      edge('石墨烯', '对撞机')
+      edge('处理器', '对撞机')
+
+      const svg = d3.select('svg'),
+        inner = svg.select('g');
+
+      svg.attr('width', 4000);
+      svg.attr('height', 8000);
+
+      // // Create the renderer
+      var render = new dagreD3.render();
+
+      // // Run the renderer. This is what draws the final graph.
+      render(inner, g);
+    </script>
+  </body>
+</html>
