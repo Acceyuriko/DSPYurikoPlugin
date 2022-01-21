@@ -18,6 +18,7 @@ namespace DSPYurikoPlugin
             w.Write(__instance.reactorPowerGen);
             w.Write(__instance.reactorEnergy);
             w.Write(__instance.reactorItemId);
+            w.Write(__instance.reactorItemInc);
             __instance.reactorStorage.Export(w);
             __instance.warpStorage.Export(w);
             w.Write(__instance.walkPower);
@@ -46,7 +47,6 @@ namespace DSPYurikoPlugin
             w.Write(__instance.droneMovement);
             for (int index = 0; index < __instance.droneCount; ++index)
                 __instance.drones[index].Export(w);
-
             __instance.appearance.Export(w);
             __instance.diyAppearance.Export(w);
             w.Write(__instance.diyItems.items.Count);
