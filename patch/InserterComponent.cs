@@ -5,32 +5,32 @@ namespace DSPYurikoPlugin
 {
     public class InserterComponentPatch
     {
-        // [HarmonyPrefix]
-        // [HarmonyPatch(
-        //     typeof(InserterComponent),
-        //     "InternalUpdate",
-        //     new Type[] { typeof(PlanetFactory), typeof(int[][]), typeof(AnimData[]), typeof(float) })
-        //  ]
-        // public static bool InserterUpdatePatch(
-        //     ref InserterComponent __instance,
-        //     PlanetFactory factory,
-        //     int[][] needsPool,
-        //     AnimData[] animPool,
-        //     float power)
-        // {
-        //     return InserterUpdateCommonPatch(ref __instance, factory, needsPool, animPool, power);
-        // }
+        [HarmonyPrefix]
+        [HarmonyPatch(
+            typeof(InserterComponent),
+            "InternalUpdate",
+            new Type[] { typeof(PlanetFactory), typeof(int[][]), typeof(AnimData[]), typeof(float) })
+         ]
+        public static bool InserterUpdatePatch(
+            ref InserterComponent __instance,
+            PlanetFactory factory,
+            int[][] needsPool,
+            AnimData[] animPool,
+            float power)
+        {
+            return InserterUpdateCommonPatch(ref __instance, factory, needsPool, animPool, power);
+        }
 
-        // [HarmonyPrefix]
-        // [HarmonyPatch(typeof(InserterComponent), "InternalUpdateNoAnim", new Type[] { typeof(PlanetFactory), typeof(int[][]), typeof(float) })]
-        // public static bool InserterUpdateNoAnimPatch(
-        //     ref InserterComponent __instance,
-        //     PlanetFactory factory,
-        //     int[][] needsPool,
-        //     float power)
-        // {
-        //     return InserterUpdateCommonPatch(ref __instance, factory, needsPool, null, power);
-        // }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(InserterComponent), "InternalUpdateNoAnim", new Type[] { typeof(PlanetFactory), typeof(int[][]), typeof(float) })]
+        public static bool InserterUpdateNoAnimPatch(
+            ref InserterComponent __instance,
+            PlanetFactory factory,
+            int[][] needsPool,
+            float power)
+        {
+            return InserterUpdateCommonPatch(ref __instance, factory, needsPool, null, power);
+        }
 
         private static bool InserterUpdateCommonPatch(
             ref InserterComponent __instance,
@@ -68,6 +68,9 @@ namespace DSPYurikoPlugin
                         if (num > 0)
                         {
                             __instance.itemId = num;
+                            __instance.itemStack += (short)stack;
+                            __instance.itemInc += (short)inc;
+                            ++__instance.stackCount;
                             __instance.time++;
                         }
                     }
@@ -80,20 +83,34 @@ namespace DSPYurikoPlugin
                     if (num > 0)
                     {
                         __instance.itemId = num;
+                        __instance.itemStack += (short)stack;
+                        __instance.itemInc += (short)inc;
+                        ++__instance.stackCount;
                         __instance.time++;
                     }
                 }
             }
-            if (__instance.itemId > 0)
+            if (__instance.itemId > 0 && __instance.stackCount > 0)
             {
-                byte remainInc;
-                int num = factory.InsertInto(__instance.insertTarget, __instance.insertOffset, __instance.itemId, (byte)0, (byte)1, out remainInc);
-                if (num <= 0)
+                int num1 = (int)((double)__instance.itemStack / (double)__instance.stackCount + 0.5);
+                int num2 = (int)((double)__instance.itemInc / (double)__instance.itemStack * (double)num1 + 0.5);
+                byte remainInc = (byte)num2;
+                int num3 = factory.InsertInto(__instance.insertTarget, __instance.insertOffset, __instance.itemId, (byte)num1, (byte)num2, out remainInc);
+                if (num3 > 0)
                 {
-                    return false;
+                    if (remainInc == (byte)0 && num3 == num1)
+                    {
+                        --__instance.stackCount;
+                    }
+                    __instance.itemStack -= (short)num3;
+                    __instance.itemInc -= (short)(num2 - (int)remainInc);
+                    if (__instance.stackCount == 0) {
+                        __instance.itemId = 0;
+                        __instance.time++;
+                        __instance.itemStack = 0;
+                        __instance.itemInc = 0;
+                    }
                 }
-                __instance.itemId = 0;
-                __instance.time++;
             }
             if (animPool != null)
             {
