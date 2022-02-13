@@ -68,7 +68,7 @@ namespace DSPYurikoPlugin
                         if (num > 0)
                         {
                             __instance.itemId = num;
-                            __instance.itemStack += (short)stack;
+                            __instance.itemCount += (short)stack;
                             __instance.itemInc += (short)inc;
                             ++__instance.stackCount;
                             __instance.time++;
@@ -83,7 +83,7 @@ namespace DSPYurikoPlugin
                     if (num > 0)
                     {
                         __instance.itemId = num;
-                        __instance.itemStack += (short)stack;
+                        __instance.itemCount += (short)stack;
                         __instance.itemInc += (short)inc;
                         ++__instance.stackCount;
                         __instance.time++;
@@ -92,8 +92,8 @@ namespace DSPYurikoPlugin
             }
             if (__instance.itemId > 0 && __instance.stackCount > 0)
             {
-                int num1 = (int)((double)__instance.itemStack / (double)__instance.stackCount + 0.5);
-                int num2 = (int)((double)__instance.itemInc / (double)__instance.itemStack * (double)num1 + 0.5);
+                int num1 = (int)__instance.itemCount / __instance.stackCount;
+                int num2 = (int)((double)__instance.itemInc / (double)__instance.itemCount * (double)num1 + 0.5);
                 byte remainInc = (byte)num2;
                 int num3 = factory.InsertInto(__instance.insertTarget, __instance.insertOffset, __instance.itemId, (byte)num1, (byte)num2, out remainInc);
                 if (num3 > 0)
@@ -102,12 +102,13 @@ namespace DSPYurikoPlugin
                     {
                         --__instance.stackCount;
                     }
-                    __instance.itemStack -= (short)num3;
+                    __instance.itemCount -= (short)num3;
                     __instance.itemInc -= (short)(num2 - (int)remainInc);
-                    if (__instance.stackCount == 0) {
+                    if (__instance.stackCount == 0)
+                    {
                         __instance.itemId = 0;
                         __instance.time++;
-                        __instance.itemStack = 0;
+                        __instance.itemCount = 0;
                         __instance.itemInc = 0;
                     }
                 }
