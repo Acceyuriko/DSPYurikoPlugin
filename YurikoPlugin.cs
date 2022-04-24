@@ -8,7 +8,7 @@ namespace DSPYurikoPlugin
   {
     public void Start()
     {
-      // Harmony.CreateAndPatchAll(typeof(AchievementSystemPatch));
+      Harmony.CreateAndPatchAll(typeof(AchievementLogicPatch));
       Harmony.CreateAndPatchAll(typeof(BuildTool_ReformPatch));
       Harmony.CreateAndPatchAll(typeof(DysonNodePatch));
       Harmony.CreateAndPatchAll(typeof(FactorySystemPatch));
