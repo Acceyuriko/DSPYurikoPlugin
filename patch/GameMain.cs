@@ -114,15 +114,15 @@ namespace DSPYurikoPlugin
           }
         }
 
-        for (int j = 1; j < factory.factorySystem.fractionateCursor; j++)
+        for (int j = 1; j < factory.factorySystem.fractionatorCursor; j++)
         {
-          ref var node = ref factory.factorySystem.fractionatePool[j];
+          ref var node = ref factory.factorySystem.fractionatorPool[j];
           if (node.fluidId > 0)
           {
-            for (int k = 0; k < RecipeProto.fractionateRecipes.Length; k++)
+            for (int k = 0; k < RecipeProto.fractionatorRecipes.Length; k++)
             {
-              var recipe = RecipeProto.fractionateRecipes[k];
-              node.produceProb = (float)recipe.ResultCounts[0] / (float)recipe.ItemCounts[0];
+              var recipe = RecipeProto.fractionatorRecipes[k];
+              node.produceProb = (float)recipe.ResultCounts[0] / recipe.ItemCounts[0];
             }
           }
         }
