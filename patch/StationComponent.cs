@@ -264,7 +264,7 @@ namespace DSPYurikoPlugin
         if (xSupplyPlanetId == ySupplyPlanetId && xDemandPlanetId == yDemandPlanetId || xSupplyPlanetId == yDemandPlanetId && xDemandPlanetId == ySupplyPlanetId) {
           return 0;
         }
-        ref var astroPoses = ref GameMain.galaxy.astroPoses;
+        ref var astroPoses = ref GameMain.galaxy.astrosData;
         var result = (astroPoses[xSupplyPlanetId].uPos - astroPoses[xDemandPlanetId].uPos).sqrMagnitude -
           (astroPoses[ySupplyPlanetId].uPos - astroPoses[yDemandPlanetId].uPos).sqrMagnitude;
         if (result < 0) {
