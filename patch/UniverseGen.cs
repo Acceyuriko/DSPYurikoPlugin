@@ -80,9 +80,9 @@ namespace DSPYurikoPlugin
 
         galaxy.stars[index] = StarGen.CreateStar(galaxy, ___tmp_poses[index], index + 1, dotNet35Random.Next(), needtype, needSpectr);
       }
-      AstroPose[] astroPoses = galaxy.astroPoses;
+      AstroData[] astroPoses = galaxy.astrosData;
       StarData[] stars = galaxy.stars;
-      for (int index = 0; index < galaxy.astroPoses.Length; ++index)
+      for (int index = 0; index < galaxy.astrosData.Length; ++index)
       {
         astroPoses[index].uRot.w = 1f;
         astroPoses[index].uRotNext.w = 1f;
