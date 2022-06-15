@@ -68,33 +68,17 @@
     <Compile Include="util/YurikoConstants.cs" />
     <Compile Include="util/YurikoLogging.cs" />
     <Compile Include="patch/AchievementLogic.cs" />
-    <Compile Include="patch/BuildTool_Reform.cs" />
-    <Compile Include="patch/GameMain.cs" />
-    <Compile Include="patch/GameHistoryData.cs" />
-    <Compile Include="patch/StorageComponent.cs" />
-    <Compile Include="patch/InserterComponent.cs" />
-    <Compile Include="patch/ItemProto.cs" />
-    <Compile Include="patch/LabComponent.cs" />
-    <Compile Include="patch/StationComponent.cs" />
-    <Compile Include="patch/RecipeProto.cs" />
-    <Compile Include="patch/DysonNode.cs" />
-    <Compile Include="patch/FactorySystem.cs" />
-    <Compile Include="patch/GameAbnormalityCheck.cs" />
-    <Compile Include="patch/StarGen.cs" />
-    <Compile Include="patch/UniverseGen.cs" />
-    <Compile Include="patch/Mecha.cs" />
-    <Compile Include="patch/ModelProto.cs" />
-    <Compile Include="patch/PowerGeneratorComponent.cs" />
+    <Compile Include="patch/AbnormalityLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <!-- <PostBuildEvent> -->
-    <!--   taskkill /f /im DSPGAME.exe -->
-    <!--   mkdir "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)" -->
-    <!--   del /q "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)" -->
-    <!--   copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)" -->
-    <!--   start steam://rungameid/1366540 -->
-    <!-- </PostBuildEvent> -->
+    <PostBuildEvent>
+      taskkill /f /im DSPGAME.exe
+      mkdir "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)"
+      del /q "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)"
+      copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Dyson Sphere Program\BepInEx\plugins\$(ProjectName)\$(TargetFileName)"
+      start steam://rungameid/1366540
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
